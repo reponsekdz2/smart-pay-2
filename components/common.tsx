@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, Picker } from './react-native';
-import { ArrowLeftIcon, HomeIcon, ArrowRightLeftIcon, PieChartIcon, UserIcon } from './icons';
+import { ArrowLeftIcon, HomeIcon, WalletIcon, UsersIcon, ChartBarIcon, UserIcon } from './icons';
 import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 
@@ -117,31 +117,50 @@ export const Card = ({ children, style, ...props }: { children: ReactNode; style
 export const BottomNav = () => {
     const { state, dispatch } = useAppContext();
     
+    // New Super App Navigation Structure
     const navItems = [
       { screen: Screen.DASHBOARD, label: 'Home', icon: HomeIcon },
-      { screen: Screen.TRANSACTION_HISTORY, label: 'History', icon: ArrowRightLeftIcon },
-      { screen: Screen.ANALYTICS, label: 'Analytics', icon: PieChartIcon },
+      { screen: Screen.CRYPTO_WALLET, label: 'Wallet', icon: WalletIcon },
+      { screen: Screen.COMMUNITY_BANKING, label: 'Community', icon: UsersIcon },
+      { screen: Screen.GOALS, label: 'Goals', icon: ChartBarIcon },
       { screen: Screen.SECURITY, label: 'Profile', icon: UserIcon },
     ];
   
     const navigate = (screen: Screen) => {
       dispatch({ type: 'NAVIGATE', payload: screen });
     };
+
+    // Mapping current screen to a main tab for active state
+    const getActiveTab = (currentScreen: string) => {
+        const screenTabMap: Record<string, Screen> = {
+            [Screen.DASHBOARD]: Screen.DASHBOARD,
+            [Screen.TRANSACTION_HISTORY]: Screen.DASHBOARD,
+            [Screen.ANALYTICS]: Screen.DASHBOARD,
+            [Screen.CRYPTO_WALLET]: Screen.CRYPTO_WALLET,
+            [Screen.COMMUNITY_BANKING]: Screen.COMMUNITY_BANKING,
+            [Screen.GOALS]: Screen.GOALS,
+            [Screen.SECURITY]: Screen.SECURITY,
+            // FIX: Remove reference to non-existent 'Screen.PROFILE'.
+            // The 'SecurityScreen' is the profile screen and is already mapped via 'Screen.SECURITY'.
+        };
+        return screenTabMap[currentScreen] || Screen.DASHBOARD;
+    }
+
+    const activeTab = getActiveTab(state.currentScreen);
   
     return (
       <View style={styles.bottomNavContainer}>
           {navItems.map((item) => {
-            // FIX: JSX requires component names to be capitalized when used as dynamic tags.
             const IconComponent = item.icon;
+            const isActive = activeTab === item.screen;
             return (
               <TouchableOpacity
                 key={item.label}
                 onPress={() => navigate(item.screen)}
                 style={styles.bottomNavItem}
               >
-                {/* FIX: SVG elements on the web expect a style object, not an array. Merging styles. */}
-                <IconComponent style={Object.assign({}, styles.bottomNavIcon, state.currentScreen === item.screen && styles.bottomNavIconActive)} />
-                <Text style={[styles.bottomNavLabel, state.currentScreen === item.screen && styles.bottomNavLabelActive]}>{item.label}</Text>
+                <IconComponent style={Object.assign({}, styles.bottomNavIcon, isActive && styles.bottomNavIconActive)} />
+                <Text style={[styles.bottomNavLabel, isActive && styles.bottomNavLabelActive]}>{item.label}</Text>
               </TouchableOpacity>
             );
           })}

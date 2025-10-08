@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Container, BottomNav, AppColors } from '../components/common';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from '../components/react-native';
 import { Screen } from '../constants';
-import { Transaction, TransactionType } from '../types';
-import { DownloadIcon, SendIcon, BanknotesIcon, PiggyBankIcon, HeartIcon } from '../components/icons';
+import { Transaction, OfflineTransaction, TransactionType } from '../types';
+import { DownloadIcon, SendIcon, BanknotesIcon, SparklesIcon, AcademicCapIcon, AtomIcon } from '../components/icons';
 
 const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
-    const isCredit = transaction.amount > 0;
+    const isCredit = transaction.type === TransactionType.RECEIVED || transaction.type === TransactionType.LOAN_DISBURSEMENT;
+    const amount = isCredit ? transaction.amount : -transaction.amount;
     return (
         <View style={styles.txItem}>
             <View style={styles.txItemLeft}>
@@ -20,7 +21,7 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
                 </View>
             </View>
             <Text style={[styles.txAmount, isCredit ? styles.txAmountCredit : styles.txAmountDebit]}>
-                {isCredit ? '+' : ''}KES {Math.abs(transaction.amount).toLocaleString()}
+                {isCredit ? '+' : '-'}KES {Math.abs(amount).toLocaleString()}
             </Text>
         </View>
     );
@@ -35,41 +36,73 @@ const QuickActionButton = ({ label, icon, onPress }: { label: string, icon: stri
     </TouchableOpacity>
 );
 
-const ServiceCard = ({ icon, title, subtitle, onPress }: { icon: React.ReactNode, title: string, subtitle: string, onPress: () => void }) => (
-    <TouchableOpacity onPress={onPress} style={styles.serviceCard}>
-        <View style={styles.serviceIconContainer}>{icon}</View>
-        <View style={styles.serviceTextContainer}>
-            <Text style={styles.serviceTitle}>{title}</Text>
-            <Text style={styles.serviceSubtitle}>{subtitle}</Text>
-        </View>
-        <Text style={styles.serviceArrow}>›</Text>
-    </TouchableOpacity>
+const DashboardSkeleton = () => (
+    <View style={styles.skeletonContainer}>
+        <View style={styles.skeletonHeader} />
+        <View style={styles.skeletonBalanceCard} />
+        <View style={styles.skeletonQuickActions} />
+        <View style={styles.skeletonSection} />
+        <View style={styles.skeletonTransaction} />
+        <View style={styles.skeletonTransaction} />
+    </View>
 );
 
+const OfflineIndicator = ({ isOnline, queueSize }: { isOnline: boolean; queueSize: number }) => {
+    if (isOnline && queueSize > 0) {
+        return <View style={styles.syncingIndicator}><Text style={styles.indicatorText}>Syncing {queueSize} items...</Text></View>;
+    }
+    if (!isOnline) {
+        return <View style={styles.offlineIndicator}><Text style={styles.indicatorText}>Offline Mode {queueSize > 0 ? `(${queueSize} pending)` : ''}</Text></View>;
+    }
+    return null;
+}
 
 export const DashboardScreen = () => {
     const { state, dispatch } = useAppContext();
-    const { user, transactions } = state;
+    const { user, transactions, isOnline, offlineQueue } = state;
+    const [isLoading, setIsLoading] = useState(true);
 
-    if (!user) {
-        return null; 
-    }
+    useEffect(() => {
+        // Simulate fetching data like react-query
+        const timer = setTimeout(() => setIsLoading(false), 1500);
+        return () => clearTimeout(timer);
+    }, []);
 
-    const navigate = (screen: Screen) => {
-        dispatch({ type: 'NAVIGATE', payload: screen });
+    useEffect(() => {
+        // Simulate processing queue when coming back online
+        if (isOnline && offlineQueue.length > 0) {
+            setTimeout(() => {
+                const syncedTransactions = offlineQueue.map(item => item.payload);
+                dispatch({ type: 'PROCESS_OFFLINE_QUEUE', payload: syncedTransactions });
+            }, 2000);
+        }
+    }, [isOnline, offlineQueue.length]);
+
+    if (!user) return null;
+
+    const navigate = (screen: Screen) => dispatch({ type: 'NAVIGATE', payload: screen });
+
+    if (isLoading) {
+        return (
+             <Container style={{ backgroundColor: AppColors.darkBackground }}>
+                <DashboardSkeleton />
+                <BottomNav />
+            </Container>
+        )
     }
 
     return (
         <Container style={{ backgroundColor: AppColors.darkBackground }}>
+            <OfflineIndicator isOnline={isOnline} queueSize={offlineQueue.length} />
             <ScrollView>
                 <View style={styles.header}>
                     <View>
                         <Text style={styles.greeting}>Hello, {user.name.split(' ')[0]}!</Text>
                         <Text style={styles.subGreeting}>Welcome back</Text>
                     </View>
-                    <View style={styles.avatar}>
+                    <TouchableOpacity onPress={() => navigate(Screen.SECURITY)} style={styles.avatar}>
                         <Text style={styles.avatarText}>{user.name.charAt(0)}</Text>
-                    </View>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.balanceCard}>
@@ -81,16 +114,17 @@ export const DashboardScreen = () => {
                     <QuickActionButton label="Pay" icon="💸" onPress={() => navigate(Screen.PAYMENT_GATEWAY)} />
                     <QuickActionButton label="Top Up" icon="💰" onPress={() => {}} />
                     <QuickActionButton label="Scan QR" icon="📷" onPress={() => navigate(Screen.QR_SCAN)} />
-                    <QuickActionButton label="More" icon="⚙️" onPress={() => {}} />
+                    <QuickActionButton label="Services" icon="⚙️" onPress={() => {}} />
                 </View>
                 
                 <View style={styles.contentArea}>
-                    <View style={styles.servicesSection}>
-                        <Text style={styles.sectionTitle}>Explore Services</Text>
-                        <ServiceCard icon={<BanknotesIcon style={{width: 24, height: 24, color: AppColors.primary}} />} title="Loans" subtitle="Instant credit at your fingertips" onPress={() => navigate(Screen.LOANS)} />
-                        <ServiceCard icon={<PiggyBankIcon style={{width: 24, height: 24, color: AppColors.success}} />} title="Savings" subtitle="Grow your money safely" onPress={() => navigate(Screen.SAVINGS)} />
-                        <ServiceCard icon={<HeartIcon style={{width: 24, height: 24, color: AppColors.danger}} />} title="Insurance" subtitle="Protect what matters most" onPress={() => navigate(Screen.INSURANCE)} />
-                    </View>
+                    <TouchableOpacity onPress={() => navigate(Screen.FUTURE_HUB)} style={styles.futureCard}>
+                        <AtomIcon style={styles.aiIcon} />
+                        <View>
+                            <Text style={styles.aiTitle}>The Future of Finance</Text>
+                            <Text style={styles.aiSubtitle}>Explore Next-Gen Banking Features</Text>
+                        </View>
+                    </TouchableOpacity>
 
                     <View style={styles.transactionsSection}>
                         <View style={styles.transactionsHeader}>
@@ -102,6 +136,14 @@ export const DashboardScreen = () => {
                         <View style={styles.transactionsList}>
                             {transactions.slice(0, 3).map(tx => <TransactionItem key={tx.id} transaction={tx} />)}
                         </View>
+                    </View>
+
+                     <View style={styles.devTools}>
+                        <Text style={styles.sectionTitle}>Dev Tools</Text>
+                        <TouchableOpacity onPress={() => dispatch({type: 'SET_ONLINE_STATUS', payload: !isOnline})} style={styles.toggleRow}>
+                            <Text>Offline Mode</Text>
+                            <View style={[styles.toggleBase, !isOnline && styles.toggleActive]}><View style={[styles.toggleKnob, !isOnline && styles.toggleKnobActive]} /></View>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </ScrollView>
@@ -125,16 +167,13 @@ const styles = StyleSheet.create({
     quickActionIcon: { fontSize: 28 },
     quickActionLabel: { color: AppColors.darkSubText, fontSize: 14, fontWeight: '500' },
     contentArea: { backgroundColor: AppColors.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, flex: 1, minHeight: 400 },
-    servicesSection: { marginBottom: 24 },
-    sectionTitle: { fontSize: 18, fontWeight: 'bold', color: AppColors.textPrimary, marginBottom: 16 },
-    serviceCard: { display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', padding: 16, borderRadius: 12, marginBottom: 8, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' },
-    serviceIconContainer: { width: 48, height: 48, borderRadius: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: AppColors.primaryLight, marginRight: 16 },
-    serviceTextContainer: { flex: 1 },
-    serviceTitle: { fontSize: 16, fontWeight: 'bold', color: AppColors.textPrimary },
-    serviceSubtitle: { fontSize: 14, color: AppColors.textSecondary },
-    serviceArrow: { fontSize: 24, color: AppColors.textSecondary },
+    futureCard: { display: 'flex', flexDirection: 'row', alignItems: 'center', background: 'linear-gradient(135deg, #6B21A8, #1877F2)', color: 'white', padding: 16, borderRadius: 12, marginBottom: 24 },
+    aiIcon: { width: 40, height: 40, color: 'white', marginRight: 16 },
+    aiTitle: { fontSize: 16, fontWeight: 'bold', color: 'white' },
+    aiSubtitle: { color: 'rgba(255,255,255,0.8)' },
     transactionsSection: {},
     transactionsHeader: { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
+    sectionTitle: { fontSize: 18, fontWeight: 'bold', color: AppColors.textPrimary },
     viewAll: { color: AppColors.primary, fontWeight: '600' },
     transactionsList: { display: 'flex', flexDirection: 'column', gap: 8 },
     txItem: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, backgroundColor: 'white', padding: 16, borderRadius: 12 },
@@ -148,4 +187,19 @@ const styles = StyleSheet.create({
     txAmount: { fontWeight: 'bold' },
     txAmountCredit: { color: AppColors.success },
     txAmountDebit: { color: AppColors.danger },
+    skeletonContainer: { padding: 24, paddingTop: 48 },
+    skeletonHeader: { height: 48, width: '60%', backgroundColor: AppColors.darkCard, borderRadius: 8, marginBottom: 24 },
+    skeletonBalanceCard: { height: 130, backgroundColor: AppColors.darkCard, borderRadius: 16, marginBottom: 24 },
+    skeletonQuickActions: { height: 96, backgroundColor: AppColors.darkCard, borderRadius: 16, marginBottom: 24 },
+    skeletonSection: { height: 60, backgroundColor: AppColors.background, borderRadius: 12, marginBottom: 24 },
+    skeletonTransaction: { height: 68, backgroundColor: AppColors.background, borderRadius: 12, marginBottom: 8 },
+    offlineIndicator: { backgroundColor: AppColors.danger, padding: 8, textAlign: 'center' },
+    syncingIndicator: { backgroundColor: '#F59E0B', padding: 8, textAlign: 'center' },
+    indicatorText: { color: 'white', fontWeight: 'bold' },
+    devTools: { marginTop: 32, backgroundColor: '#f3f4f6', padding: 16, borderRadius: 12 },
+    toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    toggleBase: { width: 50, height: 28, borderRadius: 9999, padding: 3, backgroundColor: '#e5e7eb' },
+    toggleActive: { backgroundColor: AppColors.success },
+    toggleKnob: { width: 22, height: 22, backgroundColor: 'white', borderRadius: 9999, transition: 'transform 0.2s' },
+    toggleKnobActive: { transform: 'translateX(22px)' },
 });

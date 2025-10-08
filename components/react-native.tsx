@@ -44,8 +44,19 @@ export const TextInput = ({ style, value, onChangeText, placeholder, secureTextE
     return <input type={inputType} style={flattenStyle(style)} value={value} onChange={handleChange} placeholder={placeholder} onFocus={onFocus} onBlur={onBlur} {...props} />;
 };
 
-export const ScrollView = ({ children, style, ...props }: { children?: ReactNode; style?: StyleProp }) => {
-    return <div style={{ overflow: 'auto', ...flattenStyle(style) }} {...props}>{children}</div>;
+export const ScrollView = ({ children, style, horizontal, ...props }: { children?: ReactNode; style?: StyleProp; horizontal?: boolean }) => {
+    // FIX: Implement `horizontal` prop to control scroll direction, mimicking React Native's ScrollView behavior.
+    const finalStyle = flattenStyle(style);
+    const scrollStyle: React.CSSProperties = {};
+    if (horizontal) {
+        scrollStyle.overflowX = 'auto';
+        scrollStyle.overflowY = 'hidden';
+    } else {
+        scrollStyle.overflowY = 'auto';
+        scrollStyle.overflowX = 'hidden';
+    }
+
+    return <div style={{ ...scrollStyle, ...finalStyle }} {...props}>{children}</div>;
 };
 
 export const Picker = ({ children, selectedValue, onValueChange, style }: { children: ReactNode, selectedValue: string, onValueChange: (value: string) => void, style?: StyleProp}) => {

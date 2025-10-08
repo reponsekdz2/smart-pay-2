@@ -15,6 +15,25 @@ import { LoansScreen } from './screens/LoansScreen';
 import { SavingsScreen } from './screens/SavingsScreen';
 import { InsuranceScreen } from './screens/InsuranceScreen';
 import { Button } from './components/common';
+import { SendMoneyScreen } from './screens/SendMoneyScreen';
+import { PayBillsScreen } from './screens/PayBillsScreen';
+
+// --- NEW ADVANCED SCREEN IMPORTS ---
+import { QuantumAdvisorScreen } from './screens/AIAssistantScreen';
+import { CryptoWalletScreen } from './screens/CryptoWalletScreen';
+import { CommunityBankingScreen } from './screens/CommunityBankingScreen';
+import { GoalsScreen } from './screens/GoalsScreen';
+import { MerchantPortalScreen } from './screens/MerchantPortalScreen';
+import { FinancialEducationScreen } from './screens/FinancialEducationScreen';
+
+// --- NEW NEXT-LEVEL SCREEN IMPORTS ---
+import { FutureHubScreen } from './screens/FutureHubScreen';
+import { ImpactInvestingScreen } from './screens/ImpactInvestingScreen';
+import { MetaverseBankScreen } from './screens/MetaverseBankScreen';
+import { FinancialGamingScreen } from './screens/FinancialGamingScreen';
+import { BioFinanceScreen } from './screens/BioFinanceScreen';
+import { BackendDashboardScreen } from './screens/BackendDashboardScreen';
+
 
 // A simple landing screen component
 const LandingScreen = () => {
@@ -54,14 +73,47 @@ const AppContent = () => {
         return <SecurityScreen />;
     case Screen.PAYMENT_GATEWAY:
         return <PaymentGatewayScreen />;
+    case Screen.SEND_MONEY:
+    case Screen.SEND_MONEY_CONFIRM:
+    case Screen.SEND_MONEY_SUCCESS:
+        return <SendMoneyScreen />;
+    case Screen.PAY_BILLS:
+    case Screen.PAY_BILLS_CONFIRM:
+    case Screen.PAY_BILLS_SUCCESS:
+        return <PayBillsScreen />;
     case Screen.LOANS:
         return <LoansScreen />;
     case Screen.SAVINGS:
         return <SavingsScreen />;
     case Screen.INSURANCE:
         return <InsuranceScreen />;
+    // --- NEW ADVANCED SCREEN ROUTING ---
+    case Screen.QUANTUM_ADVISOR:
+        return <QuantumAdvisorScreen />;
+    case Screen.CRYPTO_WALLET:
+        return <CryptoWalletScreen />;
+    case Screen.COMMUNITY_BANKING:
+        return <CommunityBankingScreen />;
+    case Screen.GOALS:
+        return <GoalsScreen />;
+    case Screen.MERCHANT_PORTAL:
+        return <MerchantPortalScreen />;
+    case Screen.FINANCIAL_EDUCATION:
+        return <FinancialEducationScreen />;
+    // --- NEW NEXT-LEVEL SCREEN ROUTING ---
+    case Screen.FUTURE_HUB:
+        return <FutureHubScreen />;
+    case Screen.IMPACT_INVESTING:
+        return <ImpactInvestingScreen />;
+    case Screen.METAVERSE_BANK:
+        return <MetaverseBankScreen />;
+    case Screen.FINANCIAL_GAMING:
+        return <FinancialGamingScreen />;
+    case Screen.BIO_FINANCE:
+        return <BioFinanceScreen />;
+    case Screen.BACKEND_DASHBOARD:
+        return <BackendDashboardScreen />;
     default:
-      // If a user is logged in, default to dashboard, otherwise landing
       return state.isAuthenticated ? <DashboardScreen /> : <LandingScreen />;
   }
 };

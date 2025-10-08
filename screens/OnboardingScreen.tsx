@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
-import { Container, Header, ModernInput, GradientButton, AppColors } from '../components/common';
+import { Container, Header, ModernInput, GradientButton, AppColors, Button } from '../components/common';
 import { StyleSheet, View, Text } from '../components/react-native';
 import { Transaction, TransactionType, User } from '../types';
 
@@ -14,70 +14,100 @@ const RegistrationProgress = ({ step, total }: { step: number, total: number }) 
 );
 
 const Step1_PersonalInfo = ({ onNext }: { onNext: (data: any) => void }) => {
-    const [formData, setFormData] = useState({ name: '', phoneNumber: '' });
+    const [formData, setFormData] = useState({ name: '', phoneNumber: '', nationalId: '' });
     const handleChange = (name: string, value: string) => {
         setFormData({ ...formData, [name]: value });
     };
     return (
         <>
-            <Text style={styles.title}>Personal Information</Text>
+            <Text style={styles.title}>Create Your Account</Text>
             <Text style={styles.subtitle}>Let's start with the basics.</Text>
             <View style={styles.formContainer}>
                 <ModernInput icon="👤" label="Full Name" name="name" value={formData.name} onChangeText={(val) => handleChange('name', val)} />
                 <ModernInput icon="📱" label="Phone Number" name="phoneNumber" type="tel" value={formData.phoneNumber} onChangeText={(val) => handleChange('phoneNumber', val)} />
+                <ModernInput icon="💳" label="National ID (NIDA)" name="nationalId" value={formData.nationalId} onChangeText={(val) => handleChange('nationalId', val)} />
             </View>
             <View style={styles.buttonWrapper}>
-                <GradientButton onPress={() => onNext(formData)} disabled={!formData.name || !formData.phoneNumber}>Next</GradientButton>
+                <GradientButton onPress={() => onNext(formData)} disabled={!formData.name || !formData.phoneNumber || !formData.nationalId}>Next</GradientButton>
             </View>
         </>
     );
 };
 
-const Step2_Security = ({ onNext }: { onNext: (data: any) => void }) => {
-    const [formData, setFormData] = useState({ password: '', confirmPassword: '' });
+const Step2_KYC = ({ onNext }: { onNext: () => void }) => {
+    const [verifying, setVerifying] = useState(true);
+    React.useEffect(() => {
+        const timer = setTimeout(() => setVerifying(false), 2500);
+        return () => clearTimeout(timer);
+    }, []);
+    return (
+        <>
+            <Text style={styles.title}>KYC Verification</Text>
+            <View style={styles.kycContainer}>
+                {verifying ? (
+                    <>
+                        <View style={styles.loader} />
+                        <Text style={styles.kycText}>Verifying your details with NIDA...</Text>
+                    </>
+                ) : (
+                    <>
+                        <Text style={styles.kycIcon}>✅</Text>
+                        <Text style={styles.kycText}>Verification Successful!</Text>
+                    </>
+                )}
+            </View>
+            <View style={styles.buttonWrapper}>
+                <GradientButton onPress={onNext} disabled={verifying}>Continue</GradientButton>
+            </View>
+        </>
+    );
+};
+
+
+const Step3_Security = ({ onNext }: { onNext: (data: any) => void }) => {
+    const [formData, setFormData] = useState({ password: '', pin: '' });
     const handleChange = (name: string, value: string) => {
         setFormData({ ...formData, [name]: value });
     };
-    const isPasswordValid = formData.password.length >= 6;
-    const isConfirmed = formData.password === formData.confirmPassword;
     return (
         <>
             <Text style={styles.title}>Account Security</Text>
-            <Text style={styles.subtitle}>Create a strong password for your account.</Text>
+            <Text style={styles.subtitle}>Create a strong password and a 4-digit transaction PIN.</Text>
             <View style={styles.formContainer}>
                 <ModernInput icon="🔒" label="Create Password" name="password" type="password" value={formData.password} onChangeText={(val) => handleChange('password', val)} />
-                {formData.password && !isPasswordValid && <Text style={styles.validationText}>Password must be at least 6 characters.</Text>}
-                <ModernInput icon="🔒" label="Confirm Password" name="confirmPassword" type="password" value={formData.confirmPassword} onChangeText={(val) => handleChange('confirmPassword', val)} />
-                {formData.confirmPassword && !isConfirmed && <Text style={styles.errorText}>Passwords do not match.</Text>}
+                <ModernInput icon="🔢" label="4-Digit PIN" name="pin" type="password" value={formData.pin} onChangeText={(val) => {if (val.length <= 4 && /^\d*$/.test(val)) handleChange('pin', val)}} />
             </View>
             <View style={styles.buttonWrapper}>
-                <GradientButton onPress={() => onNext(formData)} disabled={!isPasswordValid || !isConfirmed}>Next</GradientButton>
+                <GradientButton onPress={() => onNext(formData)} disabled={formData.password.length < 6 || formData.pin.length !== 4}>Next</GradientButton>
             </View>
         </>
     );
 };
 
-
-const Step3_PINSetup = ({ onComplete }: { onComplete: (data: any) => void }) => {
-    const [pin, setPin] = useState('');
+const Step4_Biometrics = ({ onComplete }: { onComplete: (data: any) => void }) => {
     return (
         <>
-            <Text style={styles.title}>Transaction PIN</Text>
-            <Text style={styles.subtitle}>Create a 4-digit PIN for secure transactions.</Text>
-            <ModernInput icon="🔢" label="4-Digit PIN" name="pin" type="password" value={pin} onChangeText={(val) => {if (val.length <= 4 && /^\d*$/.test(val)) setPin(val)}} />
+            <Text style={styles.title}>Biometric Setup</Text>
+            <Text style={styles.subtitle}>Enable fingerprint or Face ID for faster, secure logins and payments.</Text>
+            {/* FIX: Replaced non-standard 'marginVertical' with 'marginTop' and 'marginBottom' for web compatibility. */}
+            <View style={{alignItems: 'center', marginTop: 48, marginBottom: 48}}>
+                <Text style={{fontSize: 80}}>🖐️</Text>
+            </View>
             <View style={styles.buttonWrapper}>
-                <GradientButton onPress={() => onComplete({ pin })} disabled={pin.length !== 4}>Complete Setup</GradientButton>
+                <GradientButton onPress={() => onComplete({ biometricsEnabled: true })}>Enable Biometrics</GradientButton>
+                <Button variant="ghost" onPress={() => onComplete({ biometricsEnabled: false })} style={{marginTop: 8}}>
+                    <Text style={{color: AppColors.darkSubText}}>Skip for now</Text>
+                </Button>
             </View>
         </>
     );
-};
-
+}
 
 export const OnboardingScreen = () => {
     const { state, dispatch } = useAppContext();
     const [step, setStep] = useState(1);
     
-    const handleNext = (data: any) => {
+    const handleNext = (data: any = {}) => {
         dispatch({ type: 'SET_TEMP_AUTH_DATA', payload: data });
         setStep(step + 1);
     };
@@ -90,10 +120,15 @@ export const OnboardingScreen = () => {
             pin: finalData.pin,
             password: finalData.password,
             name: finalData.name,
-            nationalId: `1199${Math.floor(10000000 + Math.random() * 90000000)}`, // Mock national ID
+            nationalId: finalData.nationalId,
             balance: 1000,
             securityScore: 85,
-            biometricsEnabled: false,
+            biometricsEnabled: finalData.biometricsEnabled,
+            faceIdEnabled: finalData.biometricsEnabled,
+            voicePrintEnabled: false,
+            dnaProfileAvailable: false,
+            dailyTransactionLimit: 5000000,
+            deviceTrustScore: 95,
         };
         const initialTransaction: Transaction = {
             id: `txn_${Date.now()}`,
@@ -105,23 +140,23 @@ export const OnboardingScreen = () => {
             category: 'Bonus',
         };
         dispatch({ type: 'CREATE_ACCOUNT', payload: { user: newUser, initialTransactions: [initialTransaction] } });
-        dispatch({ type: 'NAVIGATE', payload: Screen.DASHBOARD });
     };
 
     const renderStep = () => {
         switch(step) {
             case 1: return <Step1_PersonalInfo onNext={handleNext} />;
-            case 2: return <Step2_Security onNext={handleNext} />;
-            case 3: return <Step3_PINSetup onComplete={handleComplete} />;
+            case 2: return <Step2_KYC onNext={handleNext} />;
+            case 3: return <Step3_Security onNext={handleNext} />;
+            case 4: return <Step4_Biometrics onComplete={handleComplete} />;
             default: return <Step1_PersonalInfo onNext={handleNext} />;
         }
     };
 
     return (
         <Container style={styles.container}>
-            <Header title="Create Your Account" variant="transparent" onBack={() => step > 1 ? setStep(step - 1) : dispatch({ type: 'NAVIGATE', payload: Screen.LANDING })} />
+            <Header title="" variant="transparent" onBack={() => step > 1 ? setStep(step - 1) : dispatch({ type: 'NAVIGATE', payload: Screen.LANDING })} />
             <View style={styles.content}>
-                <RegistrationProgress step={step} total={3} />
+                <RegistrationProgress step={step} total={4} />
                 {renderStep()}
             </View>
         </Container>
@@ -133,10 +168,17 @@ const styles = StyleSheet.create({
     content: { flex: 1, padding: 24, display: 'flex', flexDirection: 'column' },
     progressContainer: { width: '100%', backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: 9999, height: 6, marginBottom: 32 },
     progressBar: { backgroundColor: '#22C55E', height: 6, borderRadius: 9999, transition: 'width 0.5s' },
-    title: { fontSize: 28, fontWeight: 'bold', color: AppColors.darkText, marginBottom: 8 },
-    subtitle: { color: AppColors.darkSubText, marginBottom: 32 },
+    title: { fontSize: 28, fontWeight: 'bold', color: AppColors.darkText, marginBottom: 8, textAlign: 'center' },
+    subtitle: { color: AppColors.darkSubText, marginBottom: 32, textAlign: 'center' },
     formContainer: { display: 'flex', flexDirection: 'column', gap: 16 },
     buttonWrapper: { marginTop: 'auto', width: '100%', paddingVertical: 16 },
-    validationText: { fontSize: 12, color: '#FBBF24' },
-    errorText: { fontSize: 12, color: '#F87171' },
+    kycContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    kycIcon: { fontSize: 80 },
+    kycText: { color: AppColors.darkText, fontSize: 18, marginTop: 16 },
+    loader: { width: 60, height: 60, borderRadius: 9999, border: '5px solid #333', borderTopColor: AppColors.primary, animation: 'spin 1s linear infinite' },
 });
+
+const keyframes = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+const styleSheet = document.createElement("style");
+styleSheet.innerText = keyframes;
+document.head.appendChild(styleSheet);

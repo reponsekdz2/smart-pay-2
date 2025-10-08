@@ -19,7 +19,7 @@ export const QrScanScreen = () => {
                     reason: 'Payment via QR',
                 },
             });
-            dispatch({ type: 'NAVIGATE', payload: Screen.SEND_MONEY_CONFIRM });
+            dispatch({ type: 'NAVIGATE', payload: Screen.PAYMENT_GATEWAY });
         }, 4000);
 
         return () => clearTimeout(timer);
