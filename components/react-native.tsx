@@ -65,7 +65,10 @@ export const StyleSheet = {
     // which fixes all "Property does not exist on type 'object'" errors.
     // The `<T>` syntax in an arrow function can be misinterpreted as a JSX tag.
     // Using the method syntax `create<T>()` avoids this ambiguity.
-    create<T>(styles: T): T {
+    // This was updated to provide contextual typing to style properties, which
+    // prevents TypeScript from widening string literal types (e.g., 'row' to 'string')
+    // and causing type errors, while still allowing for custom properties.
+    create<T extends { [key: string]: React.CSSProperties & Record<string, any> }>(styles: T): T {
         return styles;
     },
 };

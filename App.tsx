@@ -6,13 +6,14 @@ import { Screen } from './constants';
 import { LoginScreen } from './screens/LoginScreen';
 import { OnboardingScreen } from './screens/OnboardingScreen';
 import { DashboardScreen } from './screens/DashboardScreen';
-import { SendMoneyScreen } from './screens/SendMoneyScreen';
-import { PayBillsScreen } from './screens/PayBillsScreen';
 import { QrScanScreen } from './screens/QrScanScreen';
 import { TransactionHistoryScreen } from './screens/TransactionHistoryScreen';
 import { AnalyticsScreen } from './screens/AnalyticsScreen';
 import { SecurityScreen } from './screens/SecurityScreen';
 import { PaymentGatewayScreen } from './screens/PaymentGatewayScreen';
+import { LoansScreen } from './screens/LoansScreen';
+import { SavingsScreen } from './screens/SavingsScreen';
+import { InsuranceScreen } from './screens/InsuranceScreen';
 import { Button } from './components/common';
 
 // A simple landing screen component
@@ -43,14 +44,6 @@ const AppContent = () => {
       return <LoginScreen />;
     case Screen.DASHBOARD:
       return <DashboardScreen />;
-    case Screen.SEND_MONEY:
-    case Screen.SEND_MONEY_CONFIRM:
-    case Screen.SEND_MONEY_SUCCESS:
-      return <SendMoneyScreen />;
-    case Screen.PAY_BILLS:
-    case Screen.PAY_BILLS_CONFIRM:
-    case Screen.PAY_BILLS_SUCCESS:
-        return <PayBillsScreen />;
     case Screen.QR_SCAN:
         return <QrScanScreen />;
     case Screen.TRANSACTION_HISTORY:
@@ -61,6 +54,12 @@ const AppContent = () => {
         return <SecurityScreen />;
     case Screen.PAYMENT_GATEWAY:
         return <PaymentGatewayScreen />;
+    case Screen.LOANS:
+        return <LoansScreen />;
+    case Screen.SAVINGS:
+        return <SavingsScreen />;
+    case Screen.INSURANCE:
+        return <InsuranceScreen />;
     default:
       // If a user is logged in, default to dashboard, otherwise landing
       return state.isAuthenticated ? <DashboardScreen /> : <LandingScreen />;

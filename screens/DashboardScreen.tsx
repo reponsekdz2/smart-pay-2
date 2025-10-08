@@ -4,7 +4,7 @@ import { Container, BottomNav, AppColors } from '../components/common';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from '../components/react-native';
 import { Screen } from '../constants';
 import { Transaction, TransactionType } from '../types';
-import { DownloadIcon, SendIcon } from '../components/icons';
+import { DownloadIcon, SendIcon, BanknotesIcon, PiggyBankIcon, HeartIcon } from '../components/icons';
 
 const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
     const isCredit = transaction.amount > 0;
@@ -35,12 +35,23 @@ const QuickActionButton = ({ label, icon, onPress }: { label: string, icon: stri
     </TouchableOpacity>
 );
 
+const ServiceCard = ({ icon, title, subtitle, onPress }: { icon: React.ReactNode, title: string, subtitle: string, onPress: () => void }) => (
+    <TouchableOpacity onPress={onPress} style={styles.serviceCard}>
+        <View style={styles.serviceIconContainer}>{icon}</View>
+        <View style={styles.serviceTextContainer}>
+            <Text style={styles.serviceTitle}>{title}</Text>
+            <Text style={styles.serviceSubtitle}>{subtitle}</Text>
+        </View>
+        <Text style={styles.serviceArrow}>›</Text>
+    </TouchableOpacity>
+);
+
+
 export const DashboardScreen = () => {
     const { state, dispatch } = useAppContext();
     const { user, transactions } = state;
 
     if (!user) {
-        // This should ideally not happen if isAuthenticated is true
         return null; 
     }
 
@@ -67,21 +78,30 @@ export const DashboardScreen = () => {
                 </View>
 
                 <View style={styles.quickActionsContainer}>
-                    <QuickActionButton label="Send" icon="💸" onPress={() => navigate(Screen.SEND_MONEY)} />
-                    <QuickActionButton label="Pay Bill" icon="🧾" onPress={() => navigate(Screen.PAY_BILLS)} />
+                    <QuickActionButton label="Pay" icon="💸" onPress={() => navigate(Screen.PAYMENT_GATEWAY)} />
+                    <QuickActionButton label="Top Up" icon="💰" onPress={() => {}} />
                     <QuickActionButton label="Scan QR" icon="📷" onPress={() => navigate(Screen.QR_SCAN)} />
                     <QuickActionButton label="More" icon="⚙️" onPress={() => {}} />
                 </View>
-
-                <View style={styles.transactionsSection}>
-                    <View style={styles.transactionsHeader}>
-                        <Text style={styles.sectionTitle}>Recent Transactions</Text>
-                        <TouchableOpacity onPress={() => navigate(Screen.TRANSACTION_HISTORY)}>
-                            <Text style={styles.viewAll}>View All</Text>
-                        </TouchableOpacity>
+                
+                <View style={styles.contentArea}>
+                    <View style={styles.servicesSection}>
+                        <Text style={styles.sectionTitle}>Explore Services</Text>
+                        <ServiceCard icon={<BanknotesIcon style={{width: 24, height: 24, color: AppColors.primary}} />} title="Loans" subtitle="Instant credit at your fingertips" onPress={() => navigate(Screen.LOANS)} />
+                        <ServiceCard icon={<PiggyBankIcon style={{width: 24, height: 24, color: AppColors.success}} />} title="Savings" subtitle="Grow your money safely" onPress={() => navigate(Screen.SAVINGS)} />
+                        <ServiceCard icon={<HeartIcon style={{width: 24, height: 24, color: AppColors.danger}} />} title="Insurance" subtitle="Protect what matters most" onPress={() => navigate(Screen.INSURANCE)} />
                     </View>
-                    <View style={styles.transactionsList}>
-                        {transactions.slice(0, 5).map(tx => <TransactionItem key={tx.id} transaction={tx} />)}
+
+                    <View style={styles.transactionsSection}>
+                        <View style={styles.transactionsHeader}>
+                            <Text style={styles.sectionTitle}>Recent Transactions</Text>
+                            <TouchableOpacity onPress={() => navigate(Screen.TRANSACTION_HISTORY)}>
+                                <Text style={styles.viewAll}>View All</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.transactionsList}>
+                            {transactions.slice(0, 3).map(tx => <TransactionItem key={tx.id} transaction={tx} />)}
+                        </View>
                     </View>
                 </View>
             </ScrollView>
@@ -104,9 +124,17 @@ const styles = StyleSheet.create({
     quickActionIconContainer: { width: 64, height: 64, backgroundColor: AppColors.darkCard, borderRadius: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' },
     quickActionIcon: { fontSize: 28 },
     quickActionLabel: { color: AppColors.darkSubText, fontSize: 14, fontWeight: '500' },
-    transactionsSection: { backgroundColor: AppColors.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, flex: 1, minHeight: 300 },
+    contentArea: { backgroundColor: AppColors.background, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, flex: 1, minHeight: 400 },
+    servicesSection: { marginBottom: 24 },
+    sectionTitle: { fontSize: 18, fontWeight: 'bold', color: AppColors.textPrimary, marginBottom: 16 },
+    serviceCard: { display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', padding: 16, borderRadius: 12, marginBottom: 8, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' },
+    serviceIconContainer: { width: 48, height: 48, borderRadius: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: AppColors.primaryLight, marginRight: 16 },
+    serviceTextContainer: { flex: 1 },
+    serviceTitle: { fontSize: 16, fontWeight: 'bold', color: AppColors.textPrimary },
+    serviceSubtitle: { fontSize: 14, color: AppColors.textSecondary },
+    serviceArrow: { fontSize: 24, color: AppColors.textSecondary },
+    transactionsSection: {},
     transactionsHeader: { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-    sectionTitle: { fontSize: 18, fontWeight: 'bold', color: AppColors.textPrimary },
     viewAll: { color: AppColors.primary, fontWeight: '600' },
     transactionsList: { display: 'flex', flexDirection: 'column', gap: 8 },
     txItem: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 12, backgroundColor: 'white', padding: 16, borderRadius: 12 },

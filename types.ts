@@ -17,6 +17,7 @@ export interface Transaction {
   date: string;
   status: 'Successful' | 'Pending' | 'Failed';
   category?: string;
+  provider?: string;
 }
 
 export interface User {
