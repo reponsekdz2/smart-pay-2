@@ -63,7 +63,11 @@ Picker.Item = ({ label, value }: { label: string, value: string }) => <option va
 export const StyleSheet = {
     // FIX: Use a generic function to preserve the type of the style object,
     // which fixes all "Property does not exist on type 'object'" errors.
-    create: <T>(styles: T): T => styles,
+    // The `<T>` syntax in an arrow function can be misinterpreted as a JSX tag.
+    // Using the method syntax `create<T>()` avoids this ambiguity.
+    create<T>(styles: T): T {
+        return styles;
+    },
 };
 
 // --- Hooks ---
@@ -74,6 +78,7 @@ interface WindowDimensions {
 }
 
 export const useWindowDimensions = (): WindowDimensions => {
+    // FIX: Ensure the WindowDimensions interface is defined before use, and that state is initialized with correct values.
     const [dimensions, setDimensions] = useState<WindowDimensions>({ width: window.innerWidth, height: window.innerHeight });
     useEffect(() => {
         const handleResize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });

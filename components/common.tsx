@@ -130,17 +130,21 @@ export const BottomNav = () => {
   
     return (
       <View style={styles.bottomNavContainer}>
-          {navItems.map((item) => (
-            <TouchableOpacity
-              key={item.label}
-              onPress={() => navigate(item.screen)}
-              style={styles.bottomNavItem}
-            >
-              {/* FIX: SVG elements on the web expect a style object, not an array. Merging styles. */}
-              <item.icon style={Object.assign({}, styles.bottomNavIcon, state.currentScreen === item.screen && styles.bottomNavIconActive)} />
-              <Text style={[styles.bottomNavLabel, state.currentScreen === item.screen && styles.bottomNavLabelActive]}>{item.label}</Text>
-            </TouchableOpacity>
-          ))}
+          {navItems.map((item) => {
+            // FIX: JSX requires component names to be capitalized when used as dynamic tags.
+            const IconComponent = item.icon;
+            return (
+              <TouchableOpacity
+                key={item.label}
+                onPress={() => navigate(item.screen)}
+                style={styles.bottomNavItem}
+              >
+                {/* FIX: SVG elements on the web expect a style object, not an array. Merging styles. */}
+                <IconComponent style={Object.assign({}, styles.bottomNavIcon, state.currentScreen === item.screen && styles.bottomNavIconActive)} />
+                <Text style={[styles.bottomNavLabel, state.currentScreen === item.screen && styles.bottomNavLabelActive]}>{item.label}</Text>
+              </TouchableOpacity>
+            );
+          })}
       </View>
     );
 };

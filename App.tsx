@@ -1,5 +1,6 @@
 import React from 'react';
-import { AppProvider, useAppContext } from './context/AppContext';
+import { AppProvider } from './context/AppContext';
+import { useAppContext } from './hooks/useAppContext';
 import { Screen } from './constants';
 
 import { LoginScreen } from './screens/LoginScreen';
