@@ -3,8 +3,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Button, Card } from '../components/common';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from '../components/react-native';
-import { MicrophoneIcon, SparklesIcon, AtomIcon } from '../components/icons';
-// FIX: Import Prediction type
+import { MicrophoneIcon, AtomIcon } from '../components/icons';
 import { Prediction } from '../types';
 
 const InfoCard = ({ title, value, unit }: { title: string, value: string | number, unit?: string }) => (
@@ -31,12 +30,11 @@ const PredictionCard = ({ title, description, onAction }: { title: string, descr
 
 export const QuantumAdvisorScreen = () => {
     const { state, dispatch } = useAppContext();
-    // FIX: Correctly get `predictions` from state.
     const { predictions } = state;
 
     return (
-        <Container style={{backgroundColor: AppColors.darkBackground}}>
-            <Header title="Quantum AI Advisor" variant="transparent" onBack={() => dispatch({ type: 'NAVIGATE', payload: Screen.DASHBOARD })} />
+        <Container style={{backgroundColor: AppColors.background}}>
+            <Header title="Quantum AI Advisor" onBack={() => dispatch({ type: 'NAVIGATE', payload: Screen.DASHBOARD })} />
             <ScrollView style={styles.content}>
                 <View style={styles.assistantHeader}>
                     <AtomIcon style={styles.headerIcon} />
@@ -88,27 +86,27 @@ const styles = StyleSheet.create({
     content: { flex: 1, padding: 24 },
     assistantHeader: { alignItems: 'center', textAlign: 'center', marginBottom: 32 },
     headerIcon: { width: 64, height: 64, color: AppColors.primary, marginBottom: 16 },
-    headerTitle: { fontSize: 28, fontWeight: 'bold', color: AppColors.darkText, marginBottom: 8 },
-    headerSubtitle: { fontSize: 16, color: AppColors.darkSubText, maxWidth: 300 },
+    headerTitle: { fontSize: 28, fontWeight: 'bold', color: AppColors.text, marginBottom: 8 },
+    headerSubtitle: { fontSize: 16, color: AppColors.subtext, maxWidth: 300 },
     
-    sectionCard: { backgroundColor: AppColors.darkCard, borderWidth: 1, borderColor: AppColors.darkBorder, marginBottom: 24 },
-    sectionTitle: { fontSize: 18, fontWeight: 'bold', color: AppColors.darkText, marginBottom: 16 },
+    sectionCard: { backgroundColor: AppColors.cardBackground, borderWidth: 1, borderColor: AppColors.cardBorder, marginBottom: 24 },
+    sectionTitle: { fontSize: 18, fontWeight: 'bold', color: AppColors.text, marginBottom: 16 },
     
     infoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 },
-    infoCard: { backgroundColor: 'rgba(255, 255, 255, 0.1)', padding: 12, borderRadius: 8 },
-    infoCardTitle: { color: AppColors.darkSubText, fontSize: 12 },
-    infoCardValue: { color: AppColors.darkText, fontSize: 20, fontWeight: 'bold' },
-    infoCardUnit: { color: AppColors.darkSubText, fontSize: 14, fontWeight: 'normal'},
+    infoCard: { backgroundColor: AppColors.background, padding: 12, borderRadius: 8 },
+    infoCardTitle: { color: AppColors.subtext, fontSize: 12 },
+    infoCardValue: { color: AppColors.text, fontSize: 20, fontWeight: 'bold' },
+    infoCardUnit: { color: AppColors.subtext, fontSize: 14, fontWeight: 'normal'},
 
-    strategyCard: { paddingVertical: 12, borderTopWidth: 1, borderColor: AppColors.darkBorder },
-    strategyTitle: { color: AppColors.darkText, fontWeight: '600' },
-    strategyDescription: { color: AppColors.darkSubText, fontSize: 14, marginTop: 4 },
+    strategyCard: { paddingVertical: 12, borderTopWidth: 1, borderColor: AppColors.cardBorder },
+    strategyTitle: { color: AppColors.text, fontWeight: '600' },
+    strategyDescription: { color: AppColors.subtext, fontSize: 14, marginTop: 4 },
 
-    predictionCard: { paddingVertical: 12, borderTopWidth: 1, borderColor: AppColors.darkBorder, backgroundColor: 'rgba(245, 158, 11, 0.1)', padding: 12, borderRadius: 8},
+    predictionCard: { paddingVertical: 12, borderTopWidth: 1, borderColor: AppColors.cardBorder, backgroundColor: 'rgba(245, 158, 11, 0.1)', padding: 12, borderRadius: 8},
     predictionTitle: { color: '#F59E0B', fontWeight: 'bold' },
 
-    micContainer: { padding: 24, alignItems: 'center', borderTopWidth: 1, borderColor: AppColors.darkBorder },
+    micContainer: { padding: 24, alignItems: 'center', borderTopWidth: 1, borderColor: AppColors.cardBorder, backgroundColor: AppColors.cardBackground },
     micButton: { width: 72, height: 72, borderRadius: 9999, backgroundColor: AppColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 20px ${AppColors.primary}`},
     micIcon: { width: 36, height: 36, color: 'white' },
-    micLabel: { marginTop: 12, color: AppColors.darkSubText, fontStyle: 'italic' }
+    micLabel: { marginTop: 12, color: AppColors.subtext, fontStyle: 'italic' }
 });

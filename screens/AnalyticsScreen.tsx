@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Container, Header, BottomNav, Card, AppColors } from '../components/common';
@@ -20,7 +21,6 @@ export const AnalyticsScreen = () => {
     const { transactions } = state;
 
     const spendingData = transactions
-        // FIX: Use correct enum values for checking transaction type.
         .filter(t => t.type !== TransactionType.RECEIVED && t.type !== TransactionType.DEPOSIT && t.type !== TransactionType.LOAN_DISBURSEMENT)
         .reduce((acc, tx) => {
             const category = tx.category || 'Other';
@@ -49,13 +49,13 @@ export const AnalyticsScreen = () => {
                         <View style={styles.cashFlowItem}>
                             <Text style={styles.cashFlowLabel}>Total In</Text>
                             <Text style={[styles.cashFlowValue, { color: AppColors.success }]}>
-                                + KES {transactions.filter(t => t.amount > 0).reduce((sum, t) => sum + t.amount, 0).toLocaleString()}
+                                + KES {transactions.filter(t => t.type === TransactionType.RECEIVED || t.type === TransactionType.DEPOSIT).reduce((sum, t) => sum + t.amount, 0).toLocaleString()}
                             </Text>
                         </View>
                         <View style={styles.cashFlowItem}>
                             <Text style={styles.cashFlowLabel}>Total Out</Text>
                             <Text style={[styles.cashFlowValue, { color: AppColors.danger }]}>
-                                - KES {transactions.filter(t => t.amount < 0).reduce((sum, t) => sum + Math.abs(t.amount), 0).toLocaleString()}
+                                - KES {transactions.filter(t => t.type !== TransactionType.RECEIVED && t.type !== TransactionType.DEPOSIT).reduce((sum, t) => sum + Math.abs(t.amount), 0).toLocaleString()}
                             </Text>
                         </View>
                     </View>

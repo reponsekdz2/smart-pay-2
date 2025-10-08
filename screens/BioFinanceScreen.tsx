@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
@@ -36,7 +37,6 @@ export const BioFinanceScreen = () => {
                     icon={<DnaIcon style={styles.icon} />}
                     title="DNA-Based Financial Planning"
                     description="Securely link your genetic profile to get AI-powered insights into your innate risk tolerance and longevity projections, helping you build a truly personalized financial plan."
-                    // FIX: Use `dnaProfileAvailable` from the user object.
                     actionText={user?.dnaProfileAvailable ? "View DNA Profile" : "Connect Genetic Data"}
                     onAction={() => alert('Redirecting to secure genetics provider...')}
                 />

@@ -107,17 +107,17 @@ export const AdminUserManagementScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    userList: { flex: 2, borderRightWidth: 1, borderColor: '#e5e7eb' },
-    tableHeader: { flexDirection: 'row', padding: 16, backgroundColor: '#f9fafb', borderBottomWidth: 1, borderColor: '#e5e7eb' },
+    userList: { flex: 2, borderRightWidth: 1, borderColor: AppColors.cardBorder },
+    tableHeader: { flexDirection: 'row', padding: 16, backgroundColor: AppColors.background, borderBottomWidth: 1, borderColor: AppColors.cardBorder },
     headerCell: { fontWeight: 'bold', color: AppColors.textSecondary },
-    userRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderColor: '#f3f4f6', cursor: 'pointer' },
+    userRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderColor: AppColors.cardBorder, cursor: 'pointer', backgroundColor: AppColors.cardBackground },
     userName: { fontWeight: '600' },
     userPhone: { color: AppColors.textSecondary, fontSize: 12 },
     statusBadge: { color: 'white', paddingVertical: 2, paddingHorizontal: 8, borderRadius: 9999, fontSize: 10, fontWeight: 'bold', textTransform: 'uppercase', textAlign: 'center' },
-    detailsPane: { flex: 1, padding: 24, backgroundColor: '#f9fafb' },
+    detailsPane: { flex: 1, padding: 24, backgroundColor: AppColors.background },
     detailsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
     detailsTitle: { fontSize: 20, fontWeight: 'bold' },
-    detailItem: { marginBottom: 8, borderBottomWidth: 1, borderColor: '#eee', paddingBottom: 8 },
+    detailItem: { marginBottom: 8, borderBottomWidth: 1, borderColor: AppColors.cardBorder, paddingBottom: 8 },
     actionSection: { marginTop: 24 },
     sectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 8 },
     buttonGroup: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' }

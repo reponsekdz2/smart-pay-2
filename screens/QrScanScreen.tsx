@@ -27,7 +27,7 @@ export const QrScanScreen = () => {
 
     return (
         <Container style={styles.container}>
-            <Header title="Scan QR to Pay" onBack={() => dispatch({ type: 'NAVIGATE', payload: Screen.DASHBOARD })} variant="transparent" />
+            <Header title="Scan QR to Pay" onBack={() => dispatch({ type: 'NAVIGATE', payload: Screen.DASHBOARD })} />
             <View style={styles.content}>
                 <View style={styles.cameraView}>
                     <Text style={styles.cameraText}>Camera view would appear here.</Text>
@@ -46,7 +46,7 @@ export const QrScanScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { backgroundColor: '#000' },
+    container: { backgroundColor: AppColors.background },
     content: {
         flex: 1,
         display: 'flex',
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     cameraView: {
         width: 300,
         height: 300,
-        backgroundColor: '#222',
+        backgroundColor: '#e4e6eb',
         borderRadius: 16,
         display: 'flex',
         alignItems: 'center',
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     cameraText: {
-        color: '#777',
+        color: AppColors.subtext,
     },
     scannerOverlay: {
         position: 'absolute',
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     },
     instructions: {
         marginTop: 24,
-        color: AppColors.darkSubText,
+        color: AppColors.subtext,
         fontSize: 16,
         textAlign: 'center',
     },

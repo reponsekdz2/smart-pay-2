@@ -2,12 +2,10 @@ import React from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Container, Header, BottomNav, AppColors } from '../components/common';
 import { StyleSheet, View, Text, ScrollView } from '../components/react-native';
-// FIX: Import TransactionStatus from types
 import { Transaction, TransactionType, TransactionStatus } from '../types';
 import { DownloadIcon, SendIcon } from '../components/icons';
 
 const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
-    // FIX: Use correct enum values for checking transaction type.
     const isCredit = transaction.type === TransactionType.RECEIVED || transaction.type === TransactionType.DEPOSIT || transaction.type === TransactionType.LOAN_DISBURSEMENT || transaction.type === TransactionType.SAVINGS_WITHDRAWAL;
     return (
         <View style={styles.txItem}>
@@ -17,7 +15,6 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
                 </View>
                 <View>
                     <Text style={styles.txDescription}>{transaction.description}</Text>
-                    {/* FIX: Use `created_at` instead of non-existent `date` property. */}
                     <Text style={styles.txDate}>{new Date(transaction.created_at).toLocaleString()}</Text>
                 </View>
             </View>
@@ -27,7 +24,6 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
                 </Text>
                 <Text style={[
                     styles.txStatus,
-                    // FIX: Use correct enum values for status check.
                     transaction.status === TransactionStatus.COMPLETED ? styles.txStatusSuccess : 
                     transaction.status === TransactionStatus.PENDING ? styles.txStatusPending : styles.txStatusFailed
                 ]}>{transaction.status}</Text>
@@ -61,10 +57,10 @@ export const TransactionHistoryScreen = () => {
 
 const styles = StyleSheet.create({
     main: { flex: 1, padding: 24 },
-    card: { backgroundColor: 'white', borderRadius: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.05)', padding: 16 },
+    card: { backgroundColor: AppColors.cardBackground, borderRadius: 12, boxShadow: '0 2px 4px rgba(0,0,0,0.05)', padding: 16 },
     noTransactionsContainer: { textAlign: 'center', paddingVertical: 80 },
     noTransactionsText: { color: AppColors.textSecondary },
-    txItem: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 16, borderBottomWidth: 1, borderColor: '#f3f4f6' },
+    txItem: { display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 16, borderBottomWidth: 1, borderColor: AppColors.cardBorder },
     txItemLeft: { display: 'flex', flexDirection: 'row', alignItems: 'center' },
     txIconContainer: { borderRadius: 9999, padding: 8, marginRight: 16 },
     txIconContainerCredit: { backgroundColor: '#D1FAE5', color: '#059669' },

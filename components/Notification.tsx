@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { StyleSheet, View, Text } from './react-native';
@@ -10,7 +11,7 @@ const Notification = ({ notification, onDismiss }: { notification: NotificationT
         return () => clearTimeout(timer);
     }, [onDismiss]);
 
-    const typeStyles = {
+    const typeStyles: Record<string, React.CSSProperties> = {
         success: { backgroundColor: AppColors.success, color: 'white' },
         error: { backgroundColor: AppColors.danger, color: 'white' },
         info: { backgroundColor: AppColors.primary, color: 'white' },

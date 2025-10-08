@@ -18,8 +18,8 @@ export const MetaverseBankScreen = () => {
     const { dispatch } = useAppContext();
 
     return (
-        <Container style={{backgroundColor: AppColors.darkBackground}}>
-            <Header title="Metaverse Banking" variant="transparent" onBack={() => dispatch({ type: 'NAVIGATE', payload: Screen.FUTURE_HUB })} />
+        <Container>
+            <Header title="Metaverse Banking" onBack={() => dispatch({ type: 'NAVIGATE', payload: Screen.FUTURE_HUB })} />
             <ScrollView style={styles.content}>
                 <View style={styles.hero}>
                     <CubeTransparentIcon style={styles.heroIcon} />
@@ -55,19 +55,19 @@ const styles = StyleSheet.create({
     content: { flex: 1, padding: 24 },
     hero: { alignItems: 'center', textAlign: 'center', marginBottom: 32 },
     heroIcon: { width: 80, height: 80, color: AppColors.primary },
-    heroTitle: { fontSize: 28, fontWeight: 'bold', color: AppColors.darkText, marginTop: 16 },
-    heroSubtitle: { color: AppColors.darkSubText, marginTop: 8, maxWidth: 320 },
+    heroTitle: { fontSize: 28, fontWeight: 'bold', color: AppColors.text, marginTop: 16 },
+    heroSubtitle: { color: AppColors.subtext, marginTop: 8, maxWidth: 320 },
     
     featureCard: {
-        backgroundColor: AppColors.darkCard,
+        backgroundColor: AppColors.cardBackground,
         borderWidth: 1,
-        borderColor: AppColors.darkBorder,
+        borderColor: AppColors.cardBorder,
         marginBottom: 16,
         alignItems: 'center',
         textAlign: 'center',
         padding: 24,
     },
     featureIcon: { fontSize: 48 },
-    featureTitle: { color: AppColors.darkText, fontSize: 20, fontWeight: 'bold', marginTop: 16 },
-    featureDescription: { color: AppColors.darkSubText, marginTop: 8 },
+    featureTitle: { color: AppColors.text, fontSize: 20, fontWeight: 'bold', marginTop: 16 },
+    featureDescription: { color: AppColors.subtext, marginTop: 8 },
 });

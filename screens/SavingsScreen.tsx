@@ -3,7 +3,6 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, Button, Card, AppColors, BottomNav } from '../components/common';
 import { View, Text, StyleSheet, ScrollView } from '../components/react-native';
-// FIX: Import SavingsGoal for type safety
 import { SavingsGoal } from '../types';
 
 const SavingsPot = ({ name, current, target }: { name: string, current: number, target: number }) => {
@@ -21,7 +20,6 @@ const SavingsPot = ({ name, current, target }: { name: string, current: number, 
 
 export const SavingsScreen = () => {
     const { state, dispatch } = useAppContext();
-    // FIX: Use `savingsGoals` instead of non-existent `goals`.
     const { savingsGoals } = state;
 
     const totalSaved = savingsGoals.reduce((sum, goal) => sum + goal.current_amount, 0);
@@ -54,25 +52,24 @@ export const SavingsScreen = () => {
 const styles = StyleSheet.create({
     content: { flex: 1, padding: 24 },
     summaryCard: {
-        backgroundColor: AppColors.primary,
+        backgroundColor: AppColors.cardBackground,
         alignItems: 'center',
     },
     summaryLabel: {
-        color: 'rgba(255, 255, 255, 0.8)',
+        color: AppColors.textSecondary,
     },
     summaryAmount: {
-        color: 'white',
+        color: AppColors.primary,
         fontSize: 32,
         fontWeight: 'bold',
         marginTop: 8,
         marginBottom: 8,
     },
     interestText: {
-        color: 'rgba(255, 255, 255, 0.8)',
+        color: AppColors.textSecondary,
         fontSize: 12,
     },
     actions: {
-        // FIX: Replace non-standard `marginVertical` with `marginTop` and `marginBottom`.
         marginTop: 24,
         marginBottom: 24,
     },
@@ -92,9 +89,10 @@ const styles = StyleSheet.create({
     progressContainer: {
         width: '100%',
         height: 8,
-        backgroundColor: '#e5e7eb',
+        backgroundColor: AppColors.cardBorder,
         borderRadius: 9999,
-        marginVertical: 8,
+        marginTop: 8,
+        marginBottom: 8,
     },
     progressBar: {
         height: '100%',

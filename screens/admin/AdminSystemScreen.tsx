@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../../hooks/useAppContext';
-import { Container, Header, AppColors, BottomNav, Card, Button, Input } from '../../components/common';
-// FIX: Import TextInput component.
+import { Container, Header, AppColors, BottomNav, Card, Button } from '../../components/common';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from '../../components/react-native';
 import { SystemSetting, FraudRule, ApiKey } from '../../types';
 
@@ -136,11 +135,11 @@ export const AdminSystemScreen = () => {
 
 const styles = StyleSheet.create({
     content: { flex: 1, padding: 24 },
-    tabs: { flexDirection: 'row', borderBottomWidth: 1, borderColor: '#e5e7eb' },
-    tab: { flex: 1, padding: 16, alignItems: 'center', backgroundColor: '#f9fafb' },
-    tabActive: { backgroundColor: AppColors.surface, fontWeight: 'bold' },
+    tabs: { flexDirection: 'row', borderBottomWidth: 1, borderColor: AppColors.cardBorder, backgroundColor: AppColors.cardBackground },
+    tab: { flex: 1, padding: 16, alignItems: 'center' },
+    tabActive: { borderBottomWidth: 2, borderColor: AppColors.primary },
     sectionTitle: { fontSize: 18, fontWeight: 'bold', color: AppColors.textPrimary, marginBottom: 16 },
-    itemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderColor: '#f3f4f6' },
+    itemRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderColor: AppColors.cardBorder },
     itemName: { fontWeight: '500' },
     itemDesc: { fontSize: 12, color: AppColors.textSecondary },
     itemValue: { color: AppColors.textPrimary },

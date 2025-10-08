@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../../hooks/useAppContext';
 import { Container, Header, AppColors, BottomNav } from '../../components/common';
 import { View, Text, StyleSheet, ScrollView, TextInput } from '../../components/react-native';
-import { Transaction, TransactionStatus, TransactionType, User } from '../../types';
+import { Transaction, TransactionStatus, User } from '../../types';
 
 const TransactionRow = ({ tx, users }: { tx: Transaction, users: User[] }) => {
     const fromUser = users.find(u => u.id === tx.from_user_id);
@@ -78,12 +78,12 @@ export const AdminTransactionScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    filterBar: { padding: 16, backgroundColor: AppColors.surface, borderBottomWidth: 1, borderColor: '#e5e7eb' },
-    searchInput: { width: '100%', padding: 12, backgroundColor: '#f3f4f6', borderRadius: 8, borderWidth: 1, borderColor: '#e5e7eb' },
+    filterBar: { padding: 16, backgroundColor: AppColors.surface, borderBottomWidth: 1, borderColor: AppColors.cardBorder },
+    searchInput: { width: '100%', padding: 12, backgroundColor: AppColors.background, borderRadius: 8, borderWidth: 1, borderColor: AppColors.cardBorder },
     txList: { flex: 1 },
-    tableHeader: { flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 8, backgroundColor: '#f9fafb' },
+    tableHeader: { flexDirection: 'row', paddingHorizontal: 16, paddingVertical: 8, backgroundColor: AppColors.background },
     headerCell: { fontWeight: 'bold', color: AppColors.textSecondary },
-    txRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderColor: '#f3f4f6' },
+    txRow: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderColor: AppColors.cardBorder, backgroundColor: AppColors.cardBackground },
     txDesc: { fontWeight: '600' },
     txSub: { color: AppColors.textSecondary, fontSize: 12, marginTop: 2 },
     txAmount: { fontWeight: 'bold' },

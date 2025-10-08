@@ -32,8 +32,8 @@ export const FutureHubScreen = () => {
     ];
 
     return (
-        <Container style={{backgroundColor: AppColors.darkBackground}}>
-            <Header title="Future of Finance" variant="transparent" onBack={() => dispatch({ type: 'NAVIGATE', payload: Screen.DASHBOARD })} />
+        <Container style={{backgroundColor: AppColors.background}}>
+            <Header title="Future of Finance" onBack={() => dispatch({ type: 'NAVIGATE', payload: Screen.DASHBOARD })} />
             <ScrollView style={styles.content}>
                  <Text style={styles.pageTitle}>Welcome to 2030</Text>
                  <Text style={styles.pageSubtitle}>Experience the next generation of financial technology, available today.</Text>
@@ -54,13 +54,13 @@ export const FutureHubScreen = () => {
 
 const styles = StyleSheet.create({
     content: { flex: 1, padding: 24 },
-    pageTitle: { fontSize: 28, fontWeight: 'bold', color: AppColors.darkText, marginBottom: 8, textAlign: 'center' },
-    pageSubtitle: { color: AppColors.darkSubText, marginBottom: 32, textAlign: 'center' },
-    menuItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: AppColors.darkCard, padding: 16, borderRadius: 12, marginBottom: 12 },
+    pageTitle: { fontSize: 28, fontWeight: 'bold', color: AppColors.text, marginBottom: 8, textAlign: 'center' },
+    pageSubtitle: { color: AppColors.subtext, marginBottom: 32, textAlign: 'center' },
+    menuItem: { flexDirection: 'row', alignItems: 'center', backgroundColor: AppColors.cardBackground, padding: 16, borderRadius: 12, marginBottom: 12, borderWidth: 1, borderColor: AppColors.cardBorder },
     iconContainer: { width: 48, height: 48, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: 16 },
     icon: { width: 28, height: 28, color: 'white' },
     textContainer: { flex: 1 },
-    title: { fontSize: 16, fontWeight: 'bold', color: AppColors.darkText },
-    subtitle: { fontSize: 14, color: AppColors.darkSubText },
-    arrow: { fontSize: 24, color: AppColors.darkSubText },
+    title: { fontSize: 16, fontWeight: 'bold', color: AppColors.text },
+    subtitle: { fontSize: 14, color: AppColors.subtext },
+    arrow: { fontSize: 24, color: AppColors.subtext },
 });

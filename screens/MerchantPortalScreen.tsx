@@ -1,9 +1,9 @@
+
 import React from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Card, Button } from '../components/common';
 import { View, Text, StyleSheet, ScrollView } from '../components/react-native';
-// FIX: Import missing type.
 import { BusinessMetric } from '../types';
 
 const MetricCard = ({ metric }: { metric: BusinessMetric }) => {
@@ -21,12 +21,10 @@ const MetricCard = ({ metric }: { metric: BusinessMetric }) => {
 
 export const MerchantPortalScreen = () => {
     const { state, dispatch } = useAppContext();
-    // FIX: Correctly get `businessMetrics` from state.
     const { user, businessMetrics } = state;
 
     return (
         <Container>
-            {/* FIX: Use `first_name` instead of non-existent `name`. */}
             <Header title={`${user?.first_name}'s Business`} onBack={() => dispatch({ type: 'NAVIGATE', payload: Screen.SECURITY })} />
             <ScrollView style={styles.content}>
                 <Text style={styles.dashboardTitle}>Business Dashboard</Text>

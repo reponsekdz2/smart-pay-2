@@ -1,14 +1,14 @@
+
 import React from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Card } from '../components/common';
 import { View, Text, StyleSheet, ScrollView } from '../components/react-native';
-// FIX: Import missing types.
-import { Goal, Badge, Quest } from '../types';
+import { Goal, Badge, Quest, GoalType } from '../types';
 
 const GoalPlanet = ({ goal }: { goal: Goal }) => {
     const progress = (goal.current / goal.target) * 100;
-    const colors = {
+    const colors: Record<GoalType, string> = {
         asset: '#1877F2',
         education: '#F59E0B',
         housing: '#42B72A',
@@ -50,7 +50,6 @@ const QuestItem = ({ quest }: { quest: Quest }) => (
 
 export const GoalsScreen = () => {
     const { state, dispatch } = useAppContext();
-    // FIX: Correctly get `goals`, `badges`, and `quests` from state.
     const { goals, badges, quests } = state;
 
     return (

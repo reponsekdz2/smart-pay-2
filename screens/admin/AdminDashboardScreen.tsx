@@ -1,8 +1,8 @@
+
 import React from 'react';
 import { useAppContext } from '../../hooks/useAppContext';
 import { Screen } from '../../constants';
 import { Container, Header, AppColors, Card, BottomNav } from '../../components/common';
-// FIX: Import TouchableOpacity to make text clickable.
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from '../../components/react-native';
 import { UserStatus, KycStatus, TransactionStatus } from '../../types';
 
@@ -48,7 +48,6 @@ export const AdminDashboardScreen = () => {
                 <Card style={{ marginTop: 24 }}>
                     <Text style={styles.sectionTitle}>Quick Actions</Text>
                      <View style={styles.quickActions}>
-                        {/* FIX: Wrap Text with TouchableOpacity to handle onPress events. */}
                         <TouchableOpacity onPress={() => dispatch({type: 'NAVIGATE', payload: Screen.ADMIN_USERS})}>
                             <Text style={styles.actionItem}>Manage Users</Text>
                         </TouchableOpacity>

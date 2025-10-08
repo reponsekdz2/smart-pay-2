@@ -11,6 +11,7 @@ const flattenStyle = (style: StyleProp | undefined): React.CSSProperties | undef
         return undefined;
     }
     if (Array.isArray(style)) {
+        // This combines all style objects in the array from left to right.
         return Object.assign({}, ...style.filter(Boolean));
     }
     return style;
@@ -39,7 +40,8 @@ export const TextInput = ({ style, value, onChangeText, placeholder, secureTextE
     let inputType = 'text';
     if (secureTextEntry) inputType = 'password';
     if (keyboardType === 'email-address') inputType = 'email';
-    if (keyboardType === 'phone-pad' || keyboardType === 'numeric') inputType = 'tel'; // 'tel' shows numeric keyboard on mobile
+    if (keyboardType === 'phone-pad') inputType = 'tel';
+    if (keyboardType === 'numeric') inputType = 'number';
 
     return <input type={inputType} style={flattenStyle(style)} value={value} onChange={handleChange} placeholder={placeholder} onFocus={onFocus} onBlur={onBlur} {...props} />;
 };
@@ -47,12 +49,14 @@ export const TextInput = ({ style, value, onChangeText, placeholder, secureTextE
 export const ScrollView = ({ children, style, horizontal, ...props }: { children?: ReactNode; style?: StyleProp; horizontal?: boolean }) => {
     // FIX: Implement `horizontal` prop to control scroll direction, mimicking React Native's ScrollView behavior.
     const finalStyle = flattenStyle(style);
-    const scrollStyle: React.CSSProperties = {};
+    const scrollStyle: React.CSSProperties = {
+        overflow: 'auto'
+    };
     if (horizontal) {
-        scrollStyle.overflowX = 'auto';
         scrollStyle.overflowY = 'hidden';
+        scrollStyle.display = 'flex';
+        scrollStyle.flexDirection = 'row';
     } else {
-        scrollStyle.overflowY = 'auto';
         scrollStyle.overflowX = 'hidden';
     }
 

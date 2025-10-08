@@ -3,7 +3,6 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, Button, Card, AppColors } from '../components/common';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from '../components/react-native';
-// FIX: Import missing types
 import { Transaction, TransactionType, Loan, TransactionStatus, TransactionCategory } from '../types';
 
 const LoanItem = ({ loan }: { loan: Loan }) => {
@@ -22,7 +21,6 @@ const LoanItem = ({ loan }: { loan: Loan }) => {
 
 export const LoansScreen = () => {
     const { state, dispatch } = useAppContext();
-    // FIX: Access `loans` from state, and wallets for balance updates.
     const { user, loans, wallets } = state;
     const [loanAmount, setLoanAmount] = useState(500);
     const [view, setView] = useState<'apply' | 'history'>('apply');
@@ -49,7 +47,6 @@ export const LoansScreen = () => {
             isRepaid: false,
         };
 
-        // FIX: Create a valid transaction object with correct enum types and all required fields.
         const newTransaction: Transaction = {
             id: `txn_${Date.now()}`,
             reference: `LOAN_${Date.now()}`,
@@ -72,10 +69,8 @@ export const LoansScreen = () => {
             updated_at: new Date().toISOString()
         };
 
-        // FIX: Use correct action types.
         dispatch({ type: 'APPLY_LOAN', payload: newLoan });
         dispatch({ type: 'ADD_TRANSACTION', payload: newTransaction });
-        // FIX: Correctly dispatch UPDATE_BALANCE with walletId and newBalance.
         dispatch({ type: 'UPDATE_BALANCE', payload: { walletId: userWallet.id, newBalance: userWallet.balance + loanAmount } });
         alert(`Loan of KES ${loanAmount} approved and disbursed!`);
     };
@@ -126,7 +121,6 @@ export const LoansScreen = () => {
                                 {loans.map(loan => <LoanItem key={loan.id} loan={loan} />)}
                            </View>
                         ) : (
-                            // FIX: Replace non-standard 'paddingVertical' with 'paddingTop' and 'paddingBottom' for web compatibility.
                             <Text style={{textAlign: 'center', color: AppColors.textSecondary, paddingTop: 32, paddingBottom: 32}}>No loan history.</Text>
                         )}
                     </Card>
@@ -138,22 +132,22 @@ export const LoansScreen = () => {
 
 const styles = StyleSheet.create({
     content: { flex: 1, padding: 24 },
-    tabs: { flexDirection: 'row', paddingHorizontal: 24, backgroundColor: AppColors.surface, borderBottomWidth: 1, borderColor: '#e5e7eb' },
+    tabs: { flexDirection: 'row', paddingHorizontal: 24, backgroundColor: AppColors.surface, borderBottomWidth: 1, borderColor: AppColors.cardBorder },
     tab: { flex: 1, paddingVertical: 16, alignItems: 'center', borderBottomWidth: 2, borderColor: 'transparent' },
     tabActive: { borderColor: AppColors.primary },
     tabText: { color: AppColors.textSecondary, fontWeight: '500' },
     tabTextActive: { color: AppColors.primary },
-    limitCard: { backgroundColor: AppColors.primary, alignItems: 'center' },
-    limitLabel: { color: 'rgba(255,255,255,0.8)' },
-    limitAmount: { color: 'white', fontSize: 28, fontWeight: 'bold', marginTop: 8 },
+    limitCard: { backgroundColor: AppColors.cardBackground, alignItems: 'center' },
+    limitLabel: { color: AppColors.textSecondary },
+    limitAmount: { color: AppColors.primary, fontSize: 28, fontWeight: 'bold', marginTop: 8 },
     sectionTitle: { fontSize: 18, fontWeight: 'bold', color: AppColors.textPrimary, marginBottom: 16, textAlign: 'center' },
     selectedAmount: { fontSize: 36, fontWeight: 'bold', textAlign: 'center', color: AppColors.primary },
-    loanSummary: { marginTop: 24, borderTopWidth: 1, borderColor: '#f3f4f6', paddingTop: 16 },
+    loanSummary: { marginTop: 24, borderTopWidth: 1, borderColor: AppColors.cardBorder, paddingTop: 16 },
     summaryItem: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8 },
     summaryTotal: { fontWeight: 'bold', fontSize: 16, marginTop: 8 },
     loanList: { display: 'flex', flexDirection: 'column', gap: 8 },
-    loanItem: { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8 },
-    loanItemRepaid: { backgroundColor: '#f9fafb', borderColor: '#f3f4f6' },
+    loanItem: { display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderWidth: 1, borderColor: AppColors.cardBorder, borderRadius: 8 },
+    loanItemRepaid: { backgroundColor: '#f0f2f5', borderColor: AppColors.cardBorder },
     loanAmount: { fontWeight: 'bold', fontSize: 16 },
     loanDate: { color: AppColors.textSecondary, fontSize: 12 },
     loanStatus: { paddingVertical: 4, paddingHorizontal: 8, borderRadius: 9999, fontSize: 12, fontWeight: '500' },

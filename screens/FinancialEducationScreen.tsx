@@ -1,13 +1,14 @@
+
+
 import React from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Card, Button } from '../components/common';
 import { View, Text, StyleSheet, ScrollView } from '../components/react-native';
-// FIX: Import missing type.
 import { Course } from '../types';
 
 const CourseCard = ({ course }: { course: Course }) => {
-    const colors = {
+    const colors: Record<string, string> = {
         beginner: AppColors.success,
         intermediate: AppColors.primary,
         advanced: AppColors.danger,
@@ -23,7 +24,8 @@ const CourseCard = ({ course }: { course: Course }) => {
             </View>
             <View style={styles.cardFooter}>
                 <Text style={styles.reward}>+ {course.reward} RWF</Text>
-                <Button onPress={() => {}} style={{paddingVertical: 6, paddingHorizontal: 12}}>Start</Button>
+                {/* FIX: `paddingVertical` and `paddingHorizontal` are not valid CSS properties for web. Replaced with directional padding properties. */}
+                <Button onPress={() => {}} style={{paddingTop: 6, paddingBottom: 6, paddingLeft: 12, paddingRight: 12}}>Start</Button>
             </View>
         </Card>
     );
@@ -32,7 +34,6 @@ const CourseCard = ({ course }: { course: Course }) => {
 
 export const FinancialEducationScreen = () => {
     const { state, dispatch } = useAppContext();
-    // FIX: Correctly get `courses` from state.
     const { courses } = state;
 
     return (
