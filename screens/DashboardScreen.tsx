@@ -1,14 +1,18 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Container, BottomNav, AppColors } from '../components/common';
 import { StyleSheet, View, Text, ScrollView, TouchableOpacity } from '../components/react-native';
 import { Screen } from '../constants';
-import { Transaction, OfflineTransaction, TransactionType } from '../types';
+// FIX: Import TransactionStatus from types
+import { Transaction, OfflineTransaction, TransactionType, TransactionStatus } from '../types';
 import { DownloadIcon, SendIcon, BanknotesIcon, SparklesIcon, AcademicCapIcon, AtomIcon } from '../components/icons';
 
 const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
-    const isCredit = transaction.type === TransactionType.RECEIVED || transaction.type === TransactionType.LOAN_DISBURSEMENT;
-    const amount = isCredit ? transaction.amount : -transaction.amount;
+    // FIX: Use correct enum values for checking transaction type.
+    const isCredit = transaction.type === TransactionType.RECEIVED || transaction.type === TransactionType.DEPOSIT || transaction.type === TransactionType.LOAN_DISBURSEMENT;
+    const amount = transaction.amount;
     return (
         <View style={styles.txItem}>
             <View style={styles.txItemLeft}>
@@ -17,7 +21,8 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
                 </View>
                 <View>
                     <Text style={styles.txDescription}>{transaction.description}</Text>
-                    <Text style={styles.txDate}>{new Date(transaction.date).toLocaleDateString()}</Text>
+                    {/* FIX: Use `created_at` instead of non-existent `date` property. */}
+                    <Text style={styles.txDate}>{new Date(transaction.created_at).toLocaleDateString()}</Text>
                 </View>
             </View>
             <Text style={[styles.txAmount, isCredit ? styles.txAmountCredit : styles.txAmountDebit]}>
@@ -59,7 +64,7 @@ const OfflineIndicator = ({ isOnline, queueSize }: { isOnline: boolean; queueSiz
 
 export const DashboardScreen = () => {
     const { state, dispatch } = useAppContext();
-    const { user, transactions, isOnline, offlineQueue } = state;
+    const { user, wallets, transactions, isOnline, offlineQueue, chaosMode } = state;
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -72,13 +77,19 @@ export const DashboardScreen = () => {
         // Simulate processing queue when coming back online
         if (isOnline && offlineQueue.length > 0) {
             setTimeout(() => {
-                const syncedTransactions = offlineQueue.map(item => item.payload);
-                dispatch({ type: 'PROCESS_OFFLINE_QUEUE', payload: syncedTransactions });
+                // FIX: The 'PROCESS_OFFLINE_QUEUE' action does not take a payload.
+                // The reducer processes one transaction from the queue at a time.
+                // This useEffect will be re-triggered as the queue length changes until it's empty.
+                dispatch({ type: 'PROCESS_OFFLINE_QUEUE' });
             }, 2000);
         }
-    }, [isOnline, offlineQueue.length]);
+    }, [isOnline, offlineQueue.length, dispatch]);
 
     if (!user) return null;
+
+    // FIX: Get user's balance from their wallet instead of the user object.
+    const userWallet = wallets.find(w => w.user_id === user.id);
+    const balance = userWallet ? userWallet.balance : 0;
 
     const navigate = (screen: Screen) => dispatch({ type: 'NAVIGATE', payload: screen });
 
@@ -97,17 +108,20 @@ export const DashboardScreen = () => {
             <ScrollView>
                 <View style={styles.header}>
                     <View>
-                        <Text style={styles.greeting}>Hello, {user.name.split(' ')[0]}!</Text>
+                        {/* FIX: Use `user.first_name` instead of non-existent `user.name`. */}
+                        <Text style={styles.greeting}>Hello, {user.first_name}!</Text>
                         <Text style={styles.subGreeting}>Welcome back</Text>
                     </View>
                     <TouchableOpacity onPress={() => navigate(Screen.SECURITY)} style={styles.avatar}>
-                        <Text style={styles.avatarText}>{user.name.charAt(0)}</Text>
+                        {/* FIX: Use `user.first_name` for avatar initial. */}
+                        <Text style={styles.avatarText}>{user.first_name?.charAt(0)}</Text>
                     </TouchableOpacity>
                 </View>
 
                 <View style={styles.balanceCard}>
                     <Text style={styles.balanceLabel}>Total Balance</Text>
-                    <Text style={styles.balanceAmount}>KES {user.balance.toLocaleString()}</Text>
+                    {/* FIX: Use balance from wallet. */}
+                    <Text style={styles.balanceAmount}>KES {balance.toLocaleString()}</Text>
                 </View>
 
                 <View style={styles.quickActionsContainer}>
@@ -143,6 +157,10 @@ export const DashboardScreen = () => {
                         <TouchableOpacity onPress={() => dispatch({type: 'SET_ONLINE_STATUS', payload: !isOnline})} style={styles.toggleRow}>
                             <Text>Offline Mode</Text>
                             <View style={[styles.toggleBase, !isOnline && styles.toggleActive]}><View style={[styles.toggleKnob, !isOnline && styles.toggleKnobActive]} /></View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => dispatch({type: 'TOGGLE_CHAOS_MODE'})} style={styles.toggleRow}>
+                            <Text style={{color: chaosMode ? AppColors.danger : AppColors.textPrimary}}>Chaos Mode (Inject Latency)</Text>
+                            <View style={[styles.toggleBase, chaosMode && styles.toggleActive, chaosMode && {backgroundColor: AppColors.danger}]}><View style={[styles.toggleKnob, chaosMode && styles.toggleKnobActive]} /></View>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -197,7 +215,7 @@ const styles = StyleSheet.create({
     syncingIndicator: { backgroundColor: '#F59E0B', padding: 8, textAlign: 'center' },
     indicatorText: { color: 'white', fontWeight: 'bold' },
     devTools: { marginTop: 32, backgroundColor: '#f3f4f6', padding: 16, borderRadius: 12 },
-    toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 },
     toggleBase: { width: 50, height: 28, borderRadius: 9999, padding: 3, backgroundColor: '#e5e7eb' },
     toggleActive: { backgroundColor: AppColors.success },
     toggleKnob: { width: 22, height: 22, backgroundColor: 'white', borderRadius: 9999, transition: 'transform 0.2s' },

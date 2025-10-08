@@ -3,6 +3,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Button, Card } from '../components/common';
 import { View, Text, StyleSheet, ScrollView } from '../components/react-native';
+// FIX: Import missing types.
 import { IbiminaGroup, CommunityProject } from '../types';
 import { UsersIcon } from '../components/icons';
 
@@ -42,6 +43,7 @@ const ProjectCard = ({ project }: { project: CommunityProject }) => {
 
 export const CommunityBankingScreen = () => {
     const { state, dispatch } = useAppContext();
+    // FIX: Correctly get `ibiminaGroups` and `communityProjects` from state.
     const { ibiminaGroups, communityProjects } = state;
 
     return (

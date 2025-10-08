@@ -3,6 +3,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Button } from '../components/common';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from '../components/react-native';
+// FIX: Import the CryptoAsset type.
 import { CryptoAsset } from '../types';
 
 const CryptoCard = ({ asset }: { asset: CryptoAsset }) => {
@@ -27,6 +28,7 @@ const CryptoCard = ({ asset }: { asset: CryptoAsset }) => {
 
 export const CryptoWalletScreen = () => {
     const { state, dispatch } = useAppContext();
+    // FIX: Correctly get `cryptoAssets` from state.
     const { cryptoAssets } = state;
 
     const totalValue = cryptoAssets.reduce((sum, asset) => sum + asset.valueRWF, 0);

@@ -3,6 +3,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Button, Card } from '../components/common';
 import { View, Text, StyleSheet, ScrollView } from '../components/react-native';
+// FIX: Import missing type.
 import { FinancialNFT } from '../types';
 
 const GameStat = ({ label, value }: { label: string, value: string | number }) => (
@@ -21,6 +22,7 @@ const NftCard = ({ nft }: { nft: FinancialNFT }) => (
 
 export const FinancialGamingScreen = () => {
     const { state, dispatch } = useAppContext();
+    // FIX: Correctly get `gameProfile` and `financialNFTs` from state.
     const { gameProfile, financialNFTs } = state;
 
     return (
@@ -32,7 +34,8 @@ export const FinancialGamingScreen = () => {
                     <View style={styles.rpgHeader}>
                         <Text style={styles.avatar}>🧙‍♂️</Text>
                         <View>
-                            <Text style={styles.characterName}>{state.user?.name || 'Player'}</Text>
+                            {/* FIX: Use `first_name` instead of non-existent `name`. */}
+                            <Text style={styles.characterName}>{state.user?.first_name || 'Player'}</Text>
                             <Text style={styles.characterClass}>Financial Mage</Text>
                         </View>
                     </View>

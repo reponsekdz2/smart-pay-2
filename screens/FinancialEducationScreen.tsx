@@ -3,6 +3,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Card, Button } from '../components/common';
 import { View, Text, StyleSheet, ScrollView } from '../components/react-native';
+// FIX: Import missing type.
 import { Course } from '../types';
 
 const CourseCard = ({ course }: { course: Course }) => {
@@ -31,6 +32,7 @@ const CourseCard = ({ course }: { course: Course }) => {
 
 export const FinancialEducationScreen = () => {
     const { state, dispatch } = useAppContext();
+    // FIX: Correctly get `courses` from state.
     const { courses } = state;
 
     return (

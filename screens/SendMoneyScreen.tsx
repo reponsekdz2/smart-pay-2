@@ -3,7 +3,8 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Button, Container, Header, Input, Card, AppColors } from '../components/common';
 import { StyleSheet, View, Text, TouchableOpacity } from '../components/react-native';
-import { Transaction, TransactionType } from '../types';
+// FIX: Import missing types
+import { Transaction, TransactionType, TransactionStatus, TransactionCategory } from '../types';
 
 const SendMoneyForm = () => {
     const { dispatch } = useAppContext();
@@ -36,7 +37,7 @@ const SendMoneyForm = () => {
 const SendMoneyConfirm = () => {
     const { state, dispatch } = useAppContext();
     const { recipient, amount, reason } = state.tempAuthData;
-    const { user } = state;
+    const { user, wallets } = state;
 
     if (!user) return null;
 
@@ -44,17 +45,40 @@ const SendMoneyConfirm = () => {
     const total = amount + fee;
 
     const handleConfirm = () => {
+        const fromWallet = wallets.find(w => w.user_id === user.id);
+        const toUser = state.users.find(u => u.phone === recipient);
+        const toWallet = toUser ? wallets.find(w => w.user_id === toUser.id) : null;
+
+        if (!fromWallet) {
+            alert("Could not find your wallet.");
+            return;
+        }
+
+        // FIX: Create a valid transaction object with correct enum types and all required fields.
         const newTransaction: Transaction = {
             id: `txn_${Date.now()}`,
+            reference: `SEND_${Date.now()}`,
+            from_wallet_id: fromWallet.id,
+            to_wallet_id: toWallet?.id || 'external',
+            from_user_id: user.id,
+            to_user_id: toUser?.id || 'external',
+            amount: amount,
+            fee: fee,
+            tax: 0,
+            total_amount: total,
+            currency: 'RWF',
             type: TransactionType.SENT,
-            amount: -amount,
             description: `To: ${recipient}`,
-            date: new Date().toISOString(),
-            status: 'Successful',
-            category: 'Transfer',
+            status: TransactionStatus.COMPLETED,
+            category: TransactionCategory.TRANSFER,
+            provider: 'INTERNAL',
+            risk_score: 0.2,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         };
         dispatch({ type: 'ADD_TRANSACTION', payload: newTransaction });
-        dispatch({ type: 'UPDATE_BALANCE', payload: user.balance - total });
+        // FIX: Correctly dispatch UPDATE_BALANCE with walletId and newBalance from the wallet.
+        dispatch({ type: 'UPDATE_BALANCE', payload: { walletId: fromWallet.id, newBalance: fromWallet.balance - total } });
         dispatch({ type: 'NAVIGATE', payload: Screen.SEND_MONEY_SUCCESS });
     };
 

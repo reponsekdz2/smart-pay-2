@@ -3,6 +3,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Button } from '../components/common';
 import { View, Text, StyleSheet, ScrollView } from '../components/react-native';
+// FIX: Import `MicroserviceStatus` enum.
 import { Microservice, MicroserviceStatus } from '../types';
 
 const ServiceCard = ({ service }: { service: Microservice }) => {

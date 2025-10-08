@@ -3,6 +3,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, AppColors, Button, Card } from '../components/common';
 import { View, Text, StyleSheet, ScrollView } from '../components/react-native';
+// FIX: Import missing types.
 import { ImpactFund, SDGProgress } from '../types';
 import { LeafIcon } from '../components/icons';
 
@@ -10,9 +11,13 @@ const FundCard = ({ fund }: { fund: ImpactFund }) => {
     const { state, dispatch } = useAppContext();
     const handleInvest = () => {
         const amount = parseInt(prompt(`How much to invest in ${fund.title}? (Min: ${fund.minInvestment})`) || '0');
-        if (amount >= fund.minInvestment && state.user && state.user.balance >= amount) {
+        const userWallet = state.wallets.find(w => w.user_id === state.user?.id);
+
+        if (userWallet && amount >= fund.minInvestment && userWallet.balance >= amount) {
+             // FIX: Use correct action type.
              dispatch({ type: 'INVEST_IMPACT_FUND', payload: { fundId: fund.id, amount } });
-             dispatch({ type: 'UPDATE_BALANCE', payload: state.user.balance - amount });
+             // FIX: Correctly dispatch UPDATE_BALANCE with walletId and newBalance.
+             dispatch({ type: 'UPDATE_BALANCE', payload: { walletId: userWallet.id, newBalance: userWallet.balance - amount } });
              alert(`Successfully invested ${amount} RWF!`);
         } else {
             alert('Invalid amount or insufficient balance.');
@@ -56,9 +61,11 @@ export const ImpactInvestingScreen = () => {
             <ScrollView style={styles.content}>
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Rwanda-Focused Impact Funds</Text>
+                    {/* FIX: Correctly get `impactFunds` from state. */}
                     {state.impactFunds.map(fund => <FundCard key={fund.id} fund={fund} />)}
                 </View>
                 <View style={styles.section}>
+                    {/* FIX: Correctly get `sdgProgress` from state. */}
                     <SDGTracker progress={state.sdgProgress} />
                 </View>
                 <Card style={styles.card}>

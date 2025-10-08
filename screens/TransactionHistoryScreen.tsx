@@ -2,11 +2,13 @@ import React from 'react';
 import { useAppContext } from '../hooks/useAppContext';
 import { Container, Header, BottomNav, AppColors } from '../components/common';
 import { StyleSheet, View, Text, ScrollView } from '../components/react-native';
-import { Transaction, TransactionType } from '../types';
+// FIX: Import TransactionStatus from types
+import { Transaction, TransactionType, TransactionStatus } from '../types';
 import { DownloadIcon, SendIcon } from '../components/icons';
 
 const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
-    const isCredit = transaction.type === TransactionType.RECEIVED || transaction.type === TransactionType.LOAN_DISBURSEMENT || transaction.type === TransactionType.SAVINGS_WITHDRAWAL;
+    // FIX: Use correct enum values for checking transaction type.
+    const isCredit = transaction.type === TransactionType.RECEIVED || transaction.type === TransactionType.DEPOSIT || transaction.type === TransactionType.LOAN_DISBURSEMENT || transaction.type === TransactionType.SAVINGS_WITHDRAWAL;
     return (
         <View style={styles.txItem}>
             <View style={styles.txItemLeft}>
@@ -15,7 +17,8 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
                 </View>
                 <View>
                     <Text style={styles.txDescription}>{transaction.description}</Text>
-                    <Text style={styles.txDate}>{new Date(transaction.date).toLocaleString()}</Text>
+                    {/* FIX: Use `created_at` instead of non-existent `date` property. */}
+                    <Text style={styles.txDate}>{new Date(transaction.created_at).toLocaleString()}</Text>
                 </View>
             </View>
             <View>
@@ -24,8 +27,9 @@ const TransactionItem = ({ transaction }: { transaction: Transaction }) => {
                 </Text>
                 <Text style={[
                     styles.txStatus,
-                    transaction.status === 'Successful' ? styles.txStatusSuccess : 
-                    transaction.status === 'Pending' ? styles.txStatusPending : styles.txStatusFailed
+                    // FIX: Use correct enum values for status check.
+                    transaction.status === TransactionStatus.COMPLETED ? styles.txStatusSuccess : 
+                    transaction.status === TransactionStatus.PENDING ? styles.txStatusPending : styles.txStatusFailed
                 ]}>{transaction.status}</Text>
             </View>
         </View>

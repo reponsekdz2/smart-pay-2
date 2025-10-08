@@ -3,7 +3,8 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Button, Container, Header, Input, Card, AppColors } from '../components/common';
 import { StyleSheet, View, Text, TouchableOpacity, Picker } from '../components/react-native';
-import { Transaction, TransactionType } from '../types';
+// FIX: Import missing types
+import { Transaction, TransactionType, TransactionStatus, TransactionCategory } from '../types';
 
 const billers = [
     { id: '1', name: 'KPLC Postpaid' },
@@ -49,7 +50,7 @@ const PayBillsForm = () => {
 const PayBillsConfirm = () => {
     const { state, dispatch } = useAppContext();
     const { biller, account, amount } = state.tempAuthData;
-    const { user } = state;
+    const { user, wallets } = state;
 
     if (!user) return null;
 
@@ -57,17 +58,36 @@ const PayBillsConfirm = () => {
     const total = amount + fee;
 
     const handleConfirm = () => {
+        const fromWallet = wallets.find(w => w.user_id === user.id);
+        if (!fromWallet) {
+            alert('Could not find your wallet.');
+            return;
+        }
+        // FIX: Create a valid transaction object with correct enum types and all required fields.
         const newTransaction: Transaction = {
             id: `txn_${Date.now()}`,
+            reference: `BILL_${Date.now()}`,
+            from_wallet_id: fromWallet.id,
+            to_wallet_id: 'biller_wallet',
+            from_user_id: user.id,
+            to_user_id: 'biller',
+            amount: amount,
+            fee: fee,
+            tax: 0,
+            total_amount: total,
+            currency: 'RWF',
             type: TransactionType.BILL_PAYMENT,
-            amount: -amount,
             description: `Payment to ${biller}`,
-            date: new Date().toISOString(),
-            status: 'Successful',
-            category: 'Bills',
+            status: TransactionStatus.COMPLETED,
+            category: TransactionCategory.BILLS,
+            provider: 'INTERNAL',
+            risk_score: 0.1,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         };
         dispatch({ type: 'ADD_TRANSACTION', payload: newTransaction });
-        dispatch({ type: 'UPDATE_BALANCE', payload: user.balance - total });
+        // FIX: Correctly dispatch UPDATE_BALANCE with walletId and newBalance from the wallet.
+        dispatch({ type: 'UPDATE_BALANCE', payload: { walletId: fromWallet.id, newBalance: fromWallet.balance - total } });
         dispatch({ type: 'NAVIGATE', payload: Screen.PAY_BILLS_SUCCESS });
     };
 

@@ -17,6 +17,8 @@ import { InsuranceScreen } from './screens/InsuranceScreen';
 import { Button } from './components/common';
 import { SendMoneyScreen } from './screens/SendMoneyScreen';
 import { PayBillsScreen } from './screens/PayBillsScreen';
+import { MfaScreen } from './screens/MfaScreen';
+import { NotificationContainer } from './components/Notification';
 
 // --- NEW ADVANCED SCREEN IMPORTS ---
 import { QuantumAdvisorScreen } from './screens/AIAssistantScreen';
@@ -33,6 +35,13 @@ import { MetaverseBankScreen } from './screens/MetaverseBankScreen';
 import { FinancialGamingScreen } from './screens/FinancialGamingScreen';
 import { BioFinanceScreen } from './screens/BioFinanceScreen';
 import { BackendDashboardScreen } from './screens/BackendDashboardScreen';
+import { SyncCenterScreen } from './screens/SyncCenterScreen';
+
+// --- NEW ADMIN SCREEN IMPORTS ---
+import { AdminDashboardScreen } from './screens/admin/AdminDashboardScreen';
+import { AdminUserManagementScreen } from './screens/admin/AdminUserManagementScreen';
+import { AdminTransactionScreen } from './screens/admin/AdminTransactionScreen';
+import { AdminSystemScreen } from './screens/admin/AdminSystemScreen';
 
 
 // A simple landing screen component
@@ -43,8 +52,8 @@ const LandingScreen = () => {
             <h1>SmartPay Pro</h1>
             <p>Your seamless financial companion.</p>
             <div style={{width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 12}}>
-              { state.user && <Button onPress={() => dispatch({ type: 'NAVIGATE', payload: Screen.LOGIN })}>Login as {state.user.name}</Button>}
-              <Button onPress={() => dispatch({ type: 'NAVIGATE', payload: Screen.ONBOARDING_PHONE })} variant={state.user ? 'secondary' : 'primary'}>Create New Account</Button>
+              <Button onPress={() => dispatch({ type: 'NAVIGATE', payload: Screen.LOGIN })}>Login</Button>
+              <Button onPress={() => dispatch({ type: 'NAVIGATE', payload: Screen.ONBOARDING_PHONE })} variant={'secondary'}>Create New Account</Button>
             </div>
         </div>
     )
@@ -61,6 +70,8 @@ const AppContent = () => {
       return <OnboardingScreen />;
     case Screen.LOGIN:
       return <LoginScreen />;
+    case Screen.MFA:
+      return <MfaScreen />;
     case Screen.DASHBOARD:
       return <DashboardScreen />;
     case Screen.QR_SCAN:
@@ -113,13 +124,25 @@ const AppContent = () => {
         return <BioFinanceScreen />;
     case Screen.BACKEND_DASHBOARD:
         return <BackendDashboardScreen />;
+    case Screen.SYNC_CENTER:
+        return <SyncCenterScreen />;
+    // --- ADMIN SCREEN ROUTING ---
+    case Screen.ADMIN_DASHBOARD:
+        return <AdminDashboardScreen />;
+    case Screen.ADMIN_USERS:
+        return <AdminUserManagementScreen />;
+    case Screen.ADMIN_TRANSACTIONS:
+        return <AdminTransactionScreen />;
+    case Screen.ADMIN_SYSTEM:
+        return <AdminSystemScreen />;
     default:
-      return state.isAuthenticated ? <DashboardScreen /> : <LandingScreen />;
+      return state.isAuthenticated ? (state.isAdmin ? <AdminDashboardScreen /> : <DashboardScreen />) : <LandingScreen />;
   }
 };
 
 const App = () => (
   <AppProvider>
+    <NotificationContainer />
     <AppContent />
   </AppProvider>
 );

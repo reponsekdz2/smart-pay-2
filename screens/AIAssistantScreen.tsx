@@ -4,6 +4,8 @@ import { Screen } from '../constants';
 import { Container, Header, AppColors, Button, Card } from '../components/common';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from '../components/react-native';
 import { MicrophoneIcon, SparklesIcon, AtomIcon } from '../components/icons';
+// FIX: Import Prediction type
+import { Prediction } from '../types';
 
 const InfoCard = ({ title, value, unit }: { title: string, value: string | number, unit?: string }) => (
     <View style={styles.infoCard}>
@@ -19,9 +21,18 @@ const StrategyCard = ({ title, description }: { title: string, description: stri
     </View>
 );
 
+const PredictionCard = ({ title, description, onAction }: { title: string, description: string, onAction: () => void }) => (
+    <View style={styles.predictionCard}>
+        <Text style={styles.predictionTitle}>{title}</Text>
+        <Text style={styles.strategyDescription}>{description}</Text>
+        <Button onPress={onAction} variant="ghost" style={{alignSelf: 'flex-start', paddingLeft: 0, marginTop: 8}}>Create Savings Goal</Button>
+    </View>
+);
 
 export const QuantumAdvisorScreen = () => {
-    const { dispatch } = useAppContext();
+    const { state, dispatch } = useAppContext();
+    // FIX: Correctly get `predictions` from state.
+    const { predictions } = state;
 
     return (
         <Container style={{backgroundColor: AppColors.darkBackground}}>
@@ -41,6 +52,18 @@ export const QuantumAdvisorScreen = () => {
                         <InfoCard title="AI-Assessed Risk Tolerance" value="Moderate" />
                         <InfoCard title="Financial Health Score" value="91" unit="/100" />
                     </View>
+                </Card>
+                
+                 <Card style={styles.sectionCard}>
+                    <Text style={styles.sectionTitle}>AI-Powered Predictions</Text>
+                    {predictions.map(p => (
+                         <PredictionCard 
+                            key={p.id}
+                            title={p.title}
+                            description={p.description}
+                            onAction={() => dispatch({type: 'NAVIGATE', payload: Screen.GOALS})}
+                         />
+                    ))}
                 </Card>
 
                  <Card style={styles.sectionCard}>
@@ -80,6 +103,9 @@ const styles = StyleSheet.create({
     strategyCard: { paddingVertical: 12, borderTopWidth: 1, borderColor: AppColors.darkBorder },
     strategyTitle: { color: AppColors.darkText, fontWeight: '600' },
     strategyDescription: { color: AppColors.darkSubText, fontSize: 14, marginTop: 4 },
+
+    predictionCard: { paddingVertical: 12, borderTopWidth: 1, borderColor: AppColors.darkBorder, backgroundColor: 'rgba(245, 158, 11, 0.1)', padding: 12, borderRadius: 8},
+    predictionTitle: { color: '#F59E0B', fontWeight: 'bold' },
 
     micContainer: { padding: 24, alignItems: 'center', borderTopWidth: 1, borderColor: AppColors.darkBorder },
     micButton: { width: 72, height: 72, borderRadius: 9999, backgroundColor: AppColors.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 20px ${AppColors.primary}`},

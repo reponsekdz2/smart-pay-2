@@ -3,6 +3,7 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, ModernInput, GradientButton, AppColors } from '../components/common';
 import { StyleSheet, View, Text, TouchableOpacity } from '../components/react-native';
+import { AdminUser, User } from '../types';
 
 export const LoginScreen = () => {
     const { state, dispatch } = useAppContext();
@@ -10,34 +11,63 @@ export const LoginScreen = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
-    const demoUser = state.user;
+    const regularUserForDemo = state.users[0]; // For easy login to user account
+
+    // Hardcoded admin user from prompt
+    const adminUser: AdminUser = {
+        id: 'admin_001',
+        phone: '0789447620',
+        email: 'admin@smartpay.rw',
+        username: 'superadmin',
+        password_hash: '123456',
+        first_name: 'System',
+        last_name: 'Administrator',
+        role: 'SUPER_ADMIN' as any,
+        permissions: { users: ["create", "read", "update", "delete"], transactions: ["full"], system: ["full_access"] },
+        two_factor_enabled: true,
+        status: 'ACTIVE',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        login_attempts: 0
+    };
+
 
     const handleLogin = () => {
-        if (demoUser && phone === demoUser.phoneNumber && password === demoUser.password) {
-            dispatch({ type: 'LOGIN', payload: demoUser });
+        // Check for Admin Login
+        if (phone === adminUser.phone && password === adminUser.password_hash) {
+            dispatch({ type: 'ADMIN_LOGIN', payload: { adminUser } });
+            dispatch({ type: 'ADD_NOTIFICATION', payload: { message: `Welcome Super Admin, ${adminUser.first_name}!`, type: 'success' } });
+            return;
+        }
+
+        // Check for Regular User Login
+        const user = state.users.find(u => u.phone === phone);
+        if (user && password === user.pin_hash) { // Using pin_hash for password in this simulation
+             // In a real app, MFA would be required. Here we simplify.
+             dispatch({ type: 'LOGIN', payload: { user } });
+             dispatch({ type: 'ADD_NOTIFICATION', payload: { message: `Welcome back, ${user.first_name}!`, type: 'success' } });
         } else {
             setError('Invalid credentials. Please try again.');
         }
     };
     
-    const handleBiometricLogin = () => {
-        if (demoUser) {
-            dispatch({ type: 'LOGIN', payload: demoUser });
-        }
-    }
-
     return (
         <Container style={styles.container}>
             <Header title="Welcome Back" variant="transparent" onBack={() => dispatch({type: 'NAVIGATE', payload: Screen.LANDING})} />
             <View style={styles.content}>
                 <View style={styles.titleContainer}>
                     <Text style={styles.title}>Sign In</Text>
-                    {demoUser && <Text style={styles.subtitle}>Enter details for {demoUser.name}</Text>}
+                    <Text style={styles.subtitle}>
+                        Demo User: {regularUserForDemo.phone} / {regularUserForDemo.pin_hash}
+                    </Text>
+                     <Text style={styles.subtitle}>
+                        Admin: {adminUser.phone} / {adminUser.password_hash}
+                    </Text>
                 </View>
 
                 <View style={styles.formContainer}>
                     <ModernInput icon="📱" label="Phone Number" type="tel" value={phone} onChangeText={setPhone} />
-                    <ModernInput icon="🔒" label="Password" type="password" value={password} onChangeText={setPassword} />
+                    <ModernInput icon="🔒" label="Password or PIN" type="password" value={password} onChangeText={setPassword} />
                 </View>
 
                 {error && <Text style={styles.errorText}>{error}</Text>}
@@ -50,21 +80,6 @@ export const LoginScreen = () => {
                 
                 <View style={styles.signInButtonContainer}>
                     <GradientButton onPress={handleLogin}>Sign In</GradientButton>
-                </View>
-
-                <View style={styles.dividerContainer}>
-                    <View style={styles.dividerLine} />
-                    <Text style={styles.dividerText}>Or continue with</Text>
-                    <View style={styles.dividerLine} />
-                </View>
-
-                <View style={styles.socialLoginContainer}>
-                    <TouchableOpacity onPress={handleBiometricLogin} style={styles.socialButton}>
-                        <Text style={styles.socialIcon}>🖐️</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleBiometricLogin} style={styles.socialButton}>
-                         <Text style={styles.socialIcon}>😀</Text>
-                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.signUpContainer}>
@@ -85,17 +100,11 @@ const styles = StyleSheet.create({
     content: { flex: 1, padding: 24, display: 'flex', flexDirection: 'column' },
     titleContainer: { textAlign: 'center', marginVertical: 16 },
     title: { fontSize: 28, fontWeight: 'bold', color: AppColors.darkText },
-    subtitle: { color: AppColors.darkSubText },
-    formContainer: { display: 'flex', flexDirection: 'column', gap: 16 },
+    subtitle: { color: AppColors.darkSubText, marginTop: 4 },
+    formContainer: { display: 'flex', flexDirection: 'column', gap: 16, marginTop: 24 },
     errorText: { color: '#F87171', fontSize: 14, marginTop: 16, textAlign: 'center' },
     forgotPasswordContainer: { width: '100%', textAlign: 'center', marginVertical: 16 },
     linkText: { color: AppColors.primary, fontWeight: '600' },
     signInButtonContainer: { marginTop: 16, width: '100%' },
-    dividerContainer: { marginVertical: 32, display: 'flex', flexDirection: 'row', alignItems: 'center' },
-    dividerLine: { flex: 1, borderTopWidth: 1, borderColor: AppColors.darkBorder },
-    dividerText: { marginHorizontal: 16, color: AppColors.darkSubText, fontSize: 14 },
-    socialLoginContainer: { display: 'flex', flexDirection: 'row', justifyContent: 'center', gap: 16 },
-    socialButton: { width: 64, height: 64, backgroundColor: AppColors.darkCard, borderRadius: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-    socialIcon: { fontSize: 32 },
     signUpContainer: { marginTop: 'auto', textAlign: 'center', paddingVertical: 16 },
 });

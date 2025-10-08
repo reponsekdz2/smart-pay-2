@@ -3,7 +3,8 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, Button, Card, AppColors } from '../components/common';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from '../components/react-native';
-import { Transaction, TransactionType, Loan } from '../types';
+// FIX: Import missing types
+import { Transaction, TransactionType, Loan, TransactionStatus, TransactionCategory } from '../types';
 
 const LoanItem = ({ loan }: { loan: Loan }) => {
     return (
@@ -21,7 +22,8 @@ const LoanItem = ({ loan }: { loan: Loan }) => {
 
 export const LoansScreen = () => {
     const { state, dispatch } = useAppContext();
-    const { user, loans } = state;
+    // FIX: Access `loans` from state, and wallets for balance updates.
+    const { user, loans, wallets } = state;
     const [loanAmount, setLoanAmount] = useState(500);
     const [view, setView] = useState<'apply' | 'history'>('apply');
 
@@ -33,6 +35,12 @@ export const LoansScreen = () => {
     const totalRepayment = loanAmount + interest;
 
     const handleApplyLoan = () => {
+        const userWallet = wallets.find(w => w.user_id === user.id);
+        if (!userWallet) {
+            alert('Could not find your wallet.');
+            return;
+        }
+
         const newLoan: Loan = {
             id: `loan_${Date.now()}`,
             amount: loanAmount,
@@ -41,19 +49,34 @@ export const LoansScreen = () => {
             isRepaid: false,
         };
 
+        // FIX: Create a valid transaction object with correct enum types and all required fields.
         const newTransaction: Transaction = {
             id: `txn_${Date.now()}`,
-            type: TransactionType.LOAN_DISBURSEMENT,
+            reference: `LOAN_${Date.now()}`,
+            from_wallet_id: 'lender_wallet',
+            to_wallet_id: userWallet.id,
+            from_user_id: 'lender',
+            to_user_id: user.id,
             amount: loanAmount,
+            fee: 0,
+            tax: 0,
+            total_amount: loanAmount,
+            currency: 'RWF',
+            type: TransactionType.LOAN_DISBURSEMENT,
             description: 'Loan disbursed to your account',
-            date: new Date().toISOString(),
-            status: 'Successful',
-            category: 'Loan',
+            status: TransactionStatus.COMPLETED,
+            category: TransactionCategory.LOAN,
+            provider: 'INTERNAL',
+            risk_score: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
         };
 
+        // FIX: Use correct action types.
         dispatch({ type: 'APPLY_LOAN', payload: newLoan });
         dispatch({ type: 'ADD_TRANSACTION', payload: newTransaction });
-        dispatch({ type: 'UPDATE_BALANCE', payload: user.balance + loanAmount });
+        // FIX: Correctly dispatch UPDATE_BALANCE with walletId and newBalance.
+        dispatch({ type: 'UPDATE_BALANCE', payload: { walletId: userWallet.id, newBalance: userWallet.balance + loanAmount } });
         alert(`Loan of KES ${loanAmount} approved and disbursed!`);
     };
 

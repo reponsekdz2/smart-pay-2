@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, TextInput, Picker } from './react-native';
-import { ArrowLeftIcon, HomeIcon, WalletIcon, UsersIcon, ChartBarIcon, UserIcon } from './icons';
+import { ArrowLeftIcon, HomeIcon, WalletIcon, UsersIcon, ChartBarIcon, UserIcon, ShieldCheckIcon, PuzzlePieceIcon } from './icons';
 import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 
@@ -117,36 +117,29 @@ export const Card = ({ children, style, ...props }: { children: ReactNode; style
 export const BottomNav = () => {
     const { state, dispatch } = useAppContext();
     
-    // New Super App Navigation Structure
-    const navItems = [
+    const userNavItems = [
       { screen: Screen.DASHBOARD, label: 'Home', icon: HomeIcon },
       { screen: Screen.CRYPTO_WALLET, label: 'Wallet', icon: WalletIcon },
       { screen: Screen.COMMUNITY_BANKING, label: 'Community', icon: UsersIcon },
       { screen: Screen.GOALS, label: 'Goals', icon: ChartBarIcon },
       { screen: Screen.SECURITY, label: 'Profile', icon: UserIcon },
     ];
+
+    const adminNavItems = [
+      { screen: Screen.ADMIN_DASHBOARD, label: 'Dashboard', icon: HomeIcon },
+      { screen: Screen.ADMIN_USERS, label: 'Users', icon: UsersIcon },
+      { screen: Screen.ADMIN_TRANSACTIONS, label: 'Transactions', icon: WalletIcon },
+      { screen: Screen.ADMIN_SYSTEM, label: 'System', icon: PuzzlePieceIcon },
+      { screen: Screen.SECURITY, label: 'Profile', icon: ShieldCheckIcon },
+    ];
+
+    const navItems = state.isAdmin ? adminNavItems : userNavItems;
   
     const navigate = (screen: Screen) => {
       dispatch({ type: 'NAVIGATE', payload: screen });
     };
 
-    // Mapping current screen to a main tab for active state
-    const getActiveTab = (currentScreen: string) => {
-        const screenTabMap: Record<string, Screen> = {
-            [Screen.DASHBOARD]: Screen.DASHBOARD,
-            [Screen.TRANSACTION_HISTORY]: Screen.DASHBOARD,
-            [Screen.ANALYTICS]: Screen.DASHBOARD,
-            [Screen.CRYPTO_WALLET]: Screen.CRYPTO_WALLET,
-            [Screen.COMMUNITY_BANKING]: Screen.COMMUNITY_BANKING,
-            [Screen.GOALS]: Screen.GOALS,
-            [Screen.SECURITY]: Screen.SECURITY,
-            // FIX: Remove reference to non-existent 'Screen.PROFILE'.
-            // The 'SecurityScreen' is the profile screen and is already mapped via 'Screen.SECURITY'.
-        };
-        return screenTabMap[currentScreen] || Screen.DASHBOARD;
-    }
-
-    const activeTab = getActiveTab(state.currentScreen);
+    const activeTab = state.currentScreen;
   
     return (
       <View style={styles.bottomNavContainer}>

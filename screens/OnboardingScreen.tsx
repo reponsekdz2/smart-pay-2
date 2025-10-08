@@ -3,7 +3,8 @@ import { useAppContext } from '../hooks/useAppContext';
 import { Screen } from '../constants';
 import { Container, Header, ModernInput, GradientButton, AppColors, Button } from '../components/common';
 import { StyleSheet, View, Text } from '../components/react-native';
-import { Transaction, TransactionType, User } from '../types';
+// FIX: Import missing types
+import { Transaction, TransactionType, User, Wallet, KycStatus, RiskLevel, UserType, UserStatus, TransactionStatus, TransactionCategory, WalletType, WalletStatus } from '../types';
 
 const RegistrationProgress = ({ step, total }: { step: number, total: number }) => (
     <View style={styles.progressContainer}>
@@ -114,32 +115,69 @@ export const OnboardingScreen = () => {
 
     const handleComplete = (data: any) => {
         const finalData = { ...state.tempAuthData, ...data };
+        // FIX: Construct a valid User object according to the `User` interface.
+        const nameParts = finalData.name.split(' ');
         const newUser: User = {
             id: `user_${Date.now()}`,
-            phoneNumber: finalData.phoneNumber,
-            pin: finalData.pin,
-            password: finalData.password,
-            name: finalData.name,
-            nationalId: finalData.nationalId,
-            balance: 1000,
-            securityScore: 85,
-            biometricsEnabled: finalData.biometricsEnabled,
-            faceIdEnabled: finalData.biometricsEnabled,
-            voicePrintEnabled: false,
-            dnaProfileAvailable: false,
-            dailyTransactionLimit: 5000000,
+            phone: finalData.phoneNumber,
+            pin_hash: finalData.pin,
+            first_name: nameParts[0],
+            last_name: nameParts.slice(1).join(' '),
+            national_id: finalData.nationalId,
+            kyc_status: KycStatus.VERIFIED,
+            risk_level: RiskLevel.LOW,
+            user_type: UserType.CUSTOMER,
+            status: UserStatus.ACTIVE,
+            login_attempts: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            dailyTransactionLimit: 500000,
             deviceTrustScore: 95,
+            biometricsEnabled: finalData.biometricsEnabled,
+            dnaProfileAvailable: false,
         };
+
+        // FIX: Create a wallet for the new user.
+        const newWallet: Wallet = {
+            id: `wallet_${Date.now()}`,
+            user_id: newUser.id,
+            wallet_number: `SPRW${finalData.phoneNumber}`,
+            balance: 1000,
+            available_balance: 1000,
+            locked_balance: 0,
+            currency: 'RWF',
+            type: WalletType.PERSONAL,
+            status: WalletStatus.ACTIVE,
+            min_balance: 0,
+            max_balance: 10000000,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+        };
+
+        // FIX: Construct a valid Transaction object with all required fields and correct enum values.
         const initialTransaction: Transaction = {
             id: `txn_${Date.now()}`,
-            type: TransactionType.RECEIVED,
+            reference: `WELCOME_${Date.now()}`,
+            from_wallet_id: 'system_wallet',
+            to_wallet_id: newWallet.id,
+            from_user_id: 'system',
+            to_user_id: newUser.id,
             amount: 1000,
+            fee: 0,
+            tax: 0,
+            total_amount: 1000,
+            currency: 'RWF',
+            type: TransactionType.RECEIVED,
             description: 'Welcome Bonus',
-            date: new Date().toISOString(),
-            status: 'Successful',
-            category: 'Bonus',
+            status: TransactionStatus.COMPLETED,
+            category: TransactionCategory.BONUS,
+            provider: 'INTERNAL',
+            risk_score: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         };
-        dispatch({ type: 'CREATE_ACCOUNT', payload: { user: newUser, initialTransactions: [initialTransaction] } });
+        // FIX: Provide the required `wallet` property in the action payload.
+        dispatch({ type: 'CREATE_ACCOUNT', payload: { user: newUser, wallet: newWallet, initialTransactions: [initialTransaction] } });
     };
 
     const renderStep = () => {
