@@ -1,107 +1,47 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { CSSProperties } from 'react';
 
-// A simple shim for React Native components for the web.
+// A basic compatibility layer to make React Native-like components work on the web.
 
-// FIX: Define a more robust style prop type that accepts single style objects or arrays of them, which is common in React Native.
-type StyleProp = React.CSSProperties | (React.CSSProperties | undefined | boolean | null)[];
-
-// FIX: Create a helper to flatten style arrays into a single style object for web compatibility.
-const flattenStyle = (style: StyleProp | undefined): React.CSSProperties | undefined => {
-    if (!style) {
-        return undefined;
-    }
-    if (Array.isArray(style)) {
-        // This combines all style objects in the array from left to right.
-        return Object.assign({}, ...style.filter(Boolean));
-    }
-    return style;
+type Style = CSSProperties & {
+    [key: string]: any;
 };
 
-
-// --- Core Components ---
-
-export const View = React.forwardRef<HTMLDivElement, { children?: ReactNode; style?: StyleProp }>(({ children, style, ...props }, ref) => {
-    return <div ref={ref} style={flattenStyle(style)} {...props}>{children}</div>;
-});
-
-export const Text = ({ children, style, ...props }: { children?: ReactNode; style?: StyleProp }) => {
-    return <p style={{ margin: 0, ...flattenStyle(style) }} {...props}>{children}</p>;
+export const View = ({ children, style }: { children?: React.ReactNode, style?: Style }) => {
+    return <div style={style}>{children}</div>;
 };
 
-export const TouchableOpacity = ({ children, onPress, style, disabled, ...props }: { children?: ReactNode; onPress?: () => void; style?: StyleProp; disabled?: boolean }) => {
-    return <button onClick={onPress} style={{ border: 'none', background: 'transparent', padding: 0, cursor: disabled ? 'default' : 'pointer', ...flattenStyle(style) }} disabled={disabled} {...props}>{children}</button>;
+export const Text = ({ children, style }: { children?: React.ReactNode, style?: Style }) => {
+    return <span style={style}>{children}</span>;
 };
 
-export const TextInput = ({ style, value, onChangeText, placeholder, secureTextEntry, keyboardType, onFocus, onBlur, ...props }: { style?: StyleProp; value: string; onChangeText: (text: string) => void; placeholder?: string; secureTextEntry?: boolean, keyboardType?: string, onFocus?: () => void, onBlur?: () => void }) => {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onChangeText(e.target.value);
+export const ScrollView = ({ children, style, horizontal }: { children?: React.ReactNode, style?: Style, horizontal?: boolean }) => {
+    const finalStyle = {
+        overflow: 'auto',
+        ...(horizontal ? { overflowX: 'auto', overflowY: 'hidden', display: 'flex' } : { overflowY: 'auto', overflowX: 'hidden' }),
+        ...style,
     };
-    
-    let inputType = 'text';
-    if (secureTextEntry) inputType = 'password';
-    if (keyboardType === 'email-address') inputType = 'email';
-    if (keyboardType === 'phone-pad') inputType = 'tel';
-    if (keyboardType === 'numeric') inputType = 'number';
-
-    return <input type={inputType} style={flattenStyle(style)} value={value} onChange={handleChange} placeholder={placeholder} onFocus={onFocus} onBlur={onBlur} {...props} />;
+    return <div style={finalStyle}>{children}</div>;
 };
 
-export const ScrollView = ({ children, style, horizontal, ...props }: { children?: ReactNode; style?: StyleProp; horizontal?: boolean }) => {
-    // FIX: Implement `horizontal` prop to control scroll direction, mimicking React Native's ScrollView behavior.
-    const finalStyle = flattenStyle(style);
-    const scrollStyle: React.CSSProperties = {
-        overflow: 'auto'
-    };
-    if (horizontal) {
-        scrollStyle.overflowY = 'hidden';
-        scrollStyle.display = 'flex';
-        scrollStyle.flexDirection = 'row';
-    } else {
-        scrollStyle.overflowX = 'hidden';
-    }
-
-    return <div style={{ ...scrollStyle, ...finalStyle }} {...props}>{children}</div>;
+export const TouchableOpacity = ({ children, style, onPress, disabled }: { children?: React.ReactNode, style?: Style, onPress?: () => void, disabled?: boolean }) => {
+    return <button onClick={onPress} style={{ border: 'none', background: 'none', padding: 0, cursor: 'pointer', ...style }} disabled={disabled}>{children}</button>;
 };
 
-export const Picker = ({ children, selectedValue, onValueChange, style }: { children: ReactNode, selectedValue: string, onValueChange: (value: string) => void, style?: StyleProp}) => {
-    return (
-        <select value={selectedValue} onChange={e => onValueChange(e.target.value)} style={flattenStyle(style)}>
-            {children}
-        </select>
-    );
+export const TextInput = ({ value, onChangeText, style, placeholder, keyboardType }: { value: string, onChangeText: (text: string) => void, style?: Style, placeholder?: string, keyboardType?: string }) => {
+    const type = keyboardType === 'numeric' ? 'number' : 'text';
+    return <input type={type} value={value} onChange={(e) => onChangeText(e.target.value)} style={style} placeholder={placeholder} />;
 };
-Picker.Item = ({ label, value }: { label: string, value: string }) => <option value={value}>{label}</option>;
 
+const PickerItem = ({ label, value }: { label: string, value: string }) => {
+    return <option value={value}>{label}</option>;
+};
 
-// --- APIs ---
+export const Picker = ({ children, selectedValue, onValueChange, style }: { children: React.ReactNode, selectedValue: string, onValueChange: (value: string) => void, style?: Style }) => {
+    return <select value={selectedValue} onChange={(e) => onValueChange(e.target.value)} style={style}>{children}</select>;
+};
+Picker.Item = PickerItem;
 
+// StyleSheet.create just returns the style object as-is on the web.
 export const StyleSheet = {
-    // FIX: Use a generic function to preserve the type of the style object,
-    // which fixes all "Property does not exist on type 'object'" errors.
-    // The `<T>` syntax in an arrow function can be misinterpreted as a JSX tag.
-    // Using the method syntax `create<T>()` avoids this ambiguity.
-    // This was updated to provide contextual typing to style properties, which
-    // prevents TypeScript from widening string literal types (e.g., 'row' to 'string')
-    // and causing type errors, while still allowing for custom properties.
-    create<T extends { [key: string]: React.CSSProperties & Record<string, any> }>(styles: T): T {
-        return styles;
-    },
-};
-
-// --- Hooks ---
-// FIX: Add interface for window dimensions to satisfy stricter typescript rules.
-interface WindowDimensions {
-    width: number;
-    height: number;
-}
-
-export const useWindowDimensions = (): WindowDimensions => {
-    // FIX: Ensure the WindowDimensions interface is defined before use, and that state is initialized with correct values.
-    const [dimensions, setDimensions] = useState<WindowDimensions>({ width: window.innerWidth, height: window.innerHeight });
-    useEffect(() => {
-        const handleResize = () => setDimensions({ width: window.innerWidth, height: window.innerHeight });
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
-    return dimensions;
+    create: (styles: Record<string, Style>) => styles,
 };

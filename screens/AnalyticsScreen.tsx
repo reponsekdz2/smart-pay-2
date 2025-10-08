@@ -20,13 +20,14 @@ export const AnalyticsScreen = () => {
     const { state, dispatch } = useAppContext();
     const { transactions } = state;
 
+    // FIX: Add explicit generic type to reduce to ensure correct type inference for `spendingData`.
     const spendingData = transactions
         .filter(t => t.type !== TransactionType.RECEIVED && t.type !== TransactionType.DEPOSIT && t.type !== TransactionType.LOAN_DISBURSEMENT)
-        .reduce((acc, tx) => {
+        .reduce<Record<string, number>>((acc, tx) => {
             const category = tx.category || 'Other';
             acc[category] = (acc[category] || 0) + Math.abs(tx.amount);
             return acc;
-        }, {} as Record<string, number>);
+        }, {});
     
     const maxSpending = Math.max(...Object.values(spendingData), 1);
 

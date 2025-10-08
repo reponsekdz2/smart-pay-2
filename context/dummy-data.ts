@@ -1,7 +1,7 @@
 
-
-
+import React from 'react';
 import { User, Wallet, Transaction, Notification, SavingsGoal, Loan, CryptoAsset, IbiminaGroup, CommunityProject, Goal, Badge, Quest, BusinessMetric, Course, ImpactFund, SDGProgress, FinancialNFT, GameProfile, Prediction, SyncConflict, OfflineTransaction, BackendService, SystemSetting, FraudRule, ApiKey, UserStatus, KycStatus, TransactionType, TransactionStatus, TransactionCategory, GoalType } from '../types';
+import { ServerStackIcon, CircleStackIcon } from '../components/icons';
 
 const USERS: User[] = [
     { id: 'user_1', first_name: 'John', last_name: 'Doe', email: 'john.doe@example.com', phone: '0788123456', national_id: '1199080012345678', status: UserStatus.ACTIVE, kyc_status: KycStatus.VERIFIED, created_at: new Date().toISOString(), dnaProfileAvailable: true },
@@ -90,7 +90,11 @@ const PREDICTIONS: Prediction[] = [
 
 const SYNC_CONFLICTS: SyncConflict[] = [];
 const OFFLINE_QUEUE: OfflineTransaction[] = [];
-const BACKEND_SERVICES: BackendService[] = [ { name: 'Core Banking', status: 'Online' }, { name: 'Payments API', status: 'Online' } ];
+// FIX: Add icon React elements to backend services to match the updated BackendService type.
+const BACKEND_SERVICES: BackendService[] = [
+    { name: 'Core Banking', status: 'Online', icon: <ServerStackIcon /> },
+    { name: 'Payments API', status: 'Online', icon: <CircleStackIcon /> }
+];
 
 const SYSTEM_SETTINGS: SystemSetting[] = [
     { id: 'ss_1', setting_key: 'MAX_TRANSFER_LIMIT', setting_value: '500000', description: 'Maximum daily transfer amount per user' },
